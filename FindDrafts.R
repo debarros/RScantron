@@ -1,5 +1,3 @@
-
-i=3
 FindDrafts = function (DraftFolderFrame){
   DraftFrame = data.frame(stringsAsFactors = FALSE)
   for (i in 1:nrow(DraftFolderFrame)){
@@ -56,7 +54,7 @@ FindDrafts_1Folder = function (DraftFolderRow){
       
       
       #Append to the Location data.frame the starting position of each test name
-      Location = cbind(Location, Location + 82)
+      Location = cbind(Location, Location + 79)
       colnames(Location) = c("TestIdStart","TestNameStart")
       
       # Next, find the ending position of every test name and a few other extraneous links
