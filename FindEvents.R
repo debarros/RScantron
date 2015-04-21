@@ -20,12 +20,12 @@ FindEvents = function (StudentFrame,
   EventFrame = data.frame(character(),character(),character(),character(),stringsAsFactors = FALSE)
   for (i in 1:nrow(StudentFrame)){
     sid = StudentFrame$sid[i]
-    x = Find1StudentTests(sid,ScantronHandle)
-    StNameRep = rep(StudentFrame$StName[i],nrow(x))
-    sidRep = rep(sid,nrow(x))
-    StNumberRep = rep(StudentFrame$StNumber[i],nrow(x))
-    x = cbind(x,StNameRep,sidRep,StNumberRep)
+    x = FindEvents_1Student(sid,ScantronHandle)
     if(nrow(x)>0){
+      StNameRep = rep(StudentFrame$StName[i],nrow(x))
+      sidRep = rep(sid,nrow(x))
+      StNumberRep = rep(StudentFrame$StNumber[i],nrow(x))
+      x = cbind(x,StNameRep,sidRep,StNumberRep)
       EventFrame = rbind(EventFrame,x)
     }
   }
