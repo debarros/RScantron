@@ -48,7 +48,8 @@ login = function(username = character(),
   curlSetOpt(.opts = Options, curl = ScantronHandle)  
   
   #Load the login page
-  x = getURI('https://admin.achievementseries.com/!/login.ssp', curl=ScantronHandle)
+  x = getURI(url = 'https://admin.achievementseries.com/!/login.ssp', 
+             curl = ScantronHandle)
   
   #Log In
   x=postForm(loginurl, .params = pars, curl=ScantronHandle, .checkParams = FALSE)

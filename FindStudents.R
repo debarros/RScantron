@@ -1,5 +1,5 @@
 FindStudents = function (ScantronHandle){
-  x = getURI('https://admin.achievementseries.com/students/list.ssp', curl=ScantronHandle)
+  x = getURI('https://admin.achievementseries.com/students/list.ssp',curl=ScantronHandle)
   page = htmlParse(x)
   links = xpathSApply(page, "//a/@href")               # this finds all of the links in the document
   StudentLinks = substr(links[grep("info.ssp\\?id=",links)],29,44)    
