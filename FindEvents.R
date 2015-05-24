@@ -8,13 +8,10 @@ FindEvents_1Student = function(sid,
     curl=ScantronHandle)
   
   # This next section is for debugging when an nrow(x) error pops up
-  j = textConnection(tests)
-  print(str(tests))
-  print(str(j))
-  write(tests, file = "testpageoutput.html")
+  write(tests, file = "~/testpageoutput.html")
   
   #convert the page to a csv
-  q = read.csv(j, stringsAsFactors = FALSE)
+  q = read.csv(textConnection(tests), stringsAsFactors = FALSE)
   q = q[,-c(2,5,7)] #remove unnecessary columns
   
   return(q)
