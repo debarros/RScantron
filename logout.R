@@ -9,10 +9,10 @@ logout = function(ScantronHandle){
              curl = ScantronHandle)
   
   #Find the location of the logout link
-  y = gregexpr("logout.ssp",x)[[1]][1]
+  y = gregexpr("Logout\\?z=.",x)[[1]][1]
   
   #Assemble the URI for the logout link
-  z = paste0("https://admin.achievementseries.com",substring(x,y-3,y+19))
+  z = paste0("https://admin.achievementseries.com",substring(x,y-6,y+15))
   
   #Fetch the URI, causing the session to be terminated
   getURI(url = z, curl = ScantronHandle)
