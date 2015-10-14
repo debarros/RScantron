@@ -3,13 +3,13 @@
 
 **Paul de Barros, Schenectady, NY, USA**
 
-## Structure:
+### Structure:
 
 * ui.R and server.R should contain as little as possible
 * All functions should be stored in separate files to make it easier to implement improvements
-* When there is a function that creates a data.frame and  calls a function that creates a row, keep those in the same file.
 
-## Naming conventions:
+
+### Naming conventions:
 
 * functions:
     * PascalCase
@@ -35,16 +35,13 @@
     * Class = a class section
     
 
-## New Functions:
+### New Functions:
 
-### These functions are not yet written, but should be easy
-* FindRecentScans # input the date and get all events since that date
-* FindDrafts # make a list of test drafts with their id codes
-* FindClasses # get a list of classes with their id codes
+#### These functions are not yet written, but should be easy
 * FindClassAverages # get every class average for a test, or for all tests
   
 
-### These functions will be a little more complicated to produce
+#### These functions will be a little more complicated to produce
 * CreateReport # use RMarkDown to write a report, or just load data in a template
 * SendReport # send an email with the report attached
 * UpdateScoreMonitoring # load data into the score monitoring spreadsheets
@@ -61,12 +58,12 @@
     * but there doesn't seem to be a way to access that data.
 
 
-### These functions will require integration with ExamView
+#### These functions will require integration with ExamView
 * CopyDraft # save a local copy of an ako draft in some simple format
 * MakeLocalDraft # convert some simple format into ExamView form
 
 
-### These functions rely on the idea of creating a local mirror of all data
+#### These functions rely on the idea of creating a local mirror of all data
 * BuildMirror # Create a local copy of all data
 * StoreMirror # save that copy
 * LoadMirror # load it from memory
