@@ -1,21 +1,4 @@
-FindEvents_1Student = function(sid, 
-                               ScantronHandle){
-  tests = getURI(
-    paste0(
-      'https://admin.achievementseries.com/student/test-results.csv?id=',
-      sid,
-      '&_list=TestResults'),
-    curl=ScantronHandle)
-  
-  # This next section is for debugging when an nrow(x) error pops up
-  write(tests, file = "~/testpageoutput.html")
-  
-  #convert the page to a csv
-  q = read.csv(textConnection(tests), stringsAsFactors = FALSE)
-  q = q[,-c(2,5,7)] #remove unnecessary columns
-  
-  return(q)
-}
+#FindEvents.R
 
 
 FindEvents = function (StudentFrame, 
