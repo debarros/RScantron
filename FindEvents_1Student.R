@@ -2,7 +2,7 @@
 
 FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
   
-  print(paste0("Attempt ",attempt))
+  
   tests = getURI(
     paste0(
       'https://admin.achievementseries.com/student/test-results.csv?id=',
@@ -20,7 +20,9 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
   
   
   #Recursive call: If the http request got an error page, redo the request
-  if(dim(q)[2] == 1){
+  print(paste0("length(q) is ",length(q), " and this is Attempt ",attempt))
+  
+  if(length(q) > 10){
     q = FindEvents_1Student(sid, ScantronHandle, attempt = attempt+1)
   }
   
