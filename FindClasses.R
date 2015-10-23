@@ -32,6 +32,8 @@ FindClasses = function(ScantronHandle){
   ClassFrame$TeacherName = TeacherLookup$TeacherName[match(x = ClassFrame$Primary.Staff, table = TeacherLookup$Primary.Staff)]
   ClassFrame$Dept = CourseLookup$Dept[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
   ClassFrame$ShortName = CourseLookup$ShortName[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
+  ClassFrame$Level = CourseLookup$Level[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
+  
   
   return(ClassFrame)
 } #end of FindClasses() function
