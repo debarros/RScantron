@@ -8,6 +8,9 @@
 * ui.R and server.R should contain as little as possible
 * All functions should be stored in separate files to make it easier to implement improvements
 
+### Current thing to work on:
+* The ScoreUpdates function.  It should filter out tests that begin with H2 and H3 and tests that end in >.  It should produce a text file with the message and scores for each updated test.  It should also produce a list of tests that need full reports, along with their earliest scan date (within the span of recent days).
+
 
 ### Naming conventions:
 
