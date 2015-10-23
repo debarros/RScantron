@@ -2,6 +2,7 @@
 
 FindRecentEvents = function(EventFrame, RecentDays){
   RecentEventFrame = EventFrame[which(EventFrame$Date >= Sys.Date()-(RecentDays - 1)),]
+  RecentEventFrame = RecentEventFrame[RecentEventFrame$Status == "Finished", ]
   return(RecentEventFrame)
 }
 
