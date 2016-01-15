@@ -72,7 +72,8 @@ FindTests_1Folder = function (TestFolderRow){
       }
       TempTests[,2] = TestFolderRow$fname[1]    
       
-      TempTests$TestName = gsub("&gt;", ">", TempTests$TestName)
+      TempTests$TestName = gsub("&gt;", ">", TempTests$TestName) #switch from html code for > to just the symbol
+      TempTests$TestName = gsub("&amp;", "&", TempTests$TestName) #switch from html code for & to just the symbol
       
       return(TempTests)
     }
