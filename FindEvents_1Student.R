@@ -15,7 +15,7 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
   
   
   #Convert the page to a usable R object
-  q = read.csv(textConnection(tests), stringsAsFactors = FALSE) #treat the page to a csv and make a data.frame
+  q = read.csv(textConnection(tests), stringsAsFactors = FALSE) #treat the page as a csv and make a data.frame
   q = q[,-c(2,5,7)] #remove unnecessary columns
   
   
