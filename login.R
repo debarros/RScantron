@@ -1,31 +1,49 @@
+#login.R
+
+# This function logs into the scantron website
+#
+# Arguments are:
+#  username - character, username for the scantron account
+#  password - character, password for the scantron account
+#  SiteCode - character, the site code for the scantron account
+#  caLocation - character, file path and name for the certification file
+#  getNewCert - logical, whether a new certification file should be downloaded
+#
+# Returned value is:
+#  ScantronHandle - object of class CURLHandle, holding information about the session with the server
+
 login = function(username = character(), 
                  password = character(), 
                  SiteCode = character(), 
-                 caLocation = character()){
-
+                 caLocation = character(),
+                 getNewCert = F){
+  
+  #Get set up ####
+  
   #set the address for the achievement series login page
   loginurl1 = "https://admin.achievementseries.com/Auth/Login/Org"  
   loginurl2 = "https://admin.achievementseries.com/Auth/?returnUrl=%2FAuth%2FLogin%2FUser"
   
-  #if the location of the certificate file is not set, download the file
-  if(length(caLocation) == 0){
-    download.file(url = "http://curl.haxx.se/ca/cacert.pem", 
-                  destfile = "~/cacert.pem.crt", 
-                  method = "auto", 
-                  quiet = TRUE, 
-                  mode = "w")
-    caLocation = path.expand("~/cacert.pem.crt")
+  
+  # If a new certification file is needed, download it
+  if(getNewCert){
+    caLocation = ObtainNewCert(caLocation)
+  } else if(nchar(caLocation) == 0){
+    caLocation = ObtainNewCert(caLocation)
+  } else if(!file.exists(caLocation)){
+    caLocation = ObtainNewCert(caLocation)
   }
   
-  #Prompt User for Input where necessary
+  
+  # Prompt User for Input where necessary
   if(length(SiteCode) == 0){SiteCode = readline(prompt="Site ID: ")}
   if(length(username) == 0){username = readline(prompt="Staff ID: ")}  
   if(length(password) == 0){password = readline(prompt="password: ")}
   
-  #Set the "agent" (the info that tells web servers what browsers we are using)
+  # Set the "agent" (the info that tells web servers what browsers we are using)
   agent="Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36" 
   
-  #Set RCurl parameters
+  # Set RCurl parameters
   Options <- curlOptions(
     cainfo = caLocation, 
     useragent = agent,
@@ -38,12 +56,14 @@ login = function(username = character(),
   
   
   
-  #Login step 0: Load the login page
+  # Login step 0 ####
+  # Load the login page
   x = getURI(url = loginurl1, curl = ScantronHandle)
   
   
   
-  #Login step 1: Enter the siteID
+  # Login step 1 ####
+  # Enter the siteID
   Token = getToken(x)
   pars=list("SiteID" = SiteCode,
             "returnUrl" = "/Auth/Login/User",
@@ -52,7 +72,8 @@ login = function(username = character(),
   
   
   
-  #Log In step 2: enter the username and password
+  # Login step 2 #### 
+  # enter the username and password
   OrgID = getOrgID(x)
   pars=list(
     "Username" = username,
@@ -63,5 +84,6 @@ login = function(username = character(),
   )
   x=postForm(uri = loginurl2, .params = pars, curl=ScantronHandle, .checkParams = FALSE)
   
+  # Return ####
   return(ScantronHandle)
 }
