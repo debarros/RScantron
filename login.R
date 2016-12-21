@@ -28,7 +28,7 @@ login = function(username = character(),
   # If a new certification file is needed, download it
   if(getNewCert){
     caLocation = ObtainNewCert(caLocation)
-  } else if(nchar(caLocation) == 0){
+  } else if(length(caLocation) == 0){
     caLocation = ObtainNewCert(caLocation)
   } else if(!file.exists(caLocation)){
     caLocation = ObtainNewCert(caLocation)
