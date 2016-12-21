@@ -2,6 +2,8 @@
 # by Paul de Barros (pj.deBarros@gmail.com)
 # Repository located at https://github.com/debarros/RScantron
 
+#Note: you must set the List Items per Page to "unlimited" in the account you use
+
 # Initialize ####
 gc() #garbage collection clears data no longer being used from memory
 source("functions.R") #load the functions
@@ -14,7 +16,7 @@ username = "sampleUser"
 password = "password1"
 SiteCode = "12-3456-7890"
 caLocation = character()
-SkipTestFolder = "skipYests"
+SkipTestFolder = "skipTests"
 SkipDraftFolder = "skipDrafts"
 SkipSessionFolder = "skipSessions"
 
@@ -35,7 +37,7 @@ ScantronHandle = login(username, password, SiteCode, caLocation)
 # Get the complete list of tests with their test ID's and containing folders
 TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
 TestFrame = FindTests(TestFolderFrame)
-OldTestFrame = readWorkbook(xlsxFile = "C:/Users/pauldeba/Documents/Everything/data drive/weekly tests/2015-2016/export link creator.xlsx", sheet = "tests")
+OldTestFrame = readWorkbook(xlsxFile = "C:/Users/pauldeba/Documents/Everything/data drive/weekly tests/2016-2017/export link creator.xlsx", sheet = "tests")
 NewTestFrame = rbind.data.frame(OldTestFrame, TestFrame[,c(1,3,2)])
 NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]
 NewTestFrame = NewTestFrame[order(NewTestFrame$TestName),]
@@ -48,9 +50,9 @@ StudentFrame = FindStudents(ScantronHandle)
 EventFrame = FindEvents(StudentFrame, ScantronHandle)
 
 # Get a list of the recently scanned instances
-RecentDays = 1
+RecentDays = 3
 #enter the date modified of recentScores.R.  If more bubble sheets could have been scanned that day, enter the day before.
-LastTime = as.Date("2016-06-04")  
+LastTime = as.Date("2016-12-19")  
 RecentDays = as.integer(Sys.Date() - LastTime)
 RecentEventFrame = FindRecentEvents(EventFrame, RecentDays)
 #View(RecentEventFrame)
@@ -60,7 +62,7 @@ RecentTestFrame = FindRecentTests(RecentEventFrame)
 View(RecentTestFrame)
 
 #Create output of the scores that need quick updates or reports
-cap = 10 #only tests with fewer than cap new scores will be included in the quick updates
+cap = 5 #only tests with fewer than cap new scores will be included in the quick updates
 ScoreUpdates(RecentEventFrame, RecentTestFrame, cap)
 
 # Catalog Draft Tests ####
@@ -72,6 +74,9 @@ SessionFolderFrame = FindFolders(ScantronHandle, "s", SkipSessionFolder)
 # Get the complete list of test drafts with their test ID's and containing folders
 DraftFrame = FindDrafts(DraftFolderFrame)
 
+# Get the page showing the content of each draft
+# If you have a lot of drafts, include the parameter MaxDrafts = n (where n is some small integer)
+DraftFrame = StoreDrafts(DraftFrame)
 
 # Catalog class sections ####
 #Get the complete list of class sections with their class ID's
