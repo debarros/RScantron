@@ -5,7 +5,7 @@
 # Otherwise, it sets the folder path and file name to the default
 
 ObtainNewCert = function(caLocation){
-  if(nchar(caLocation) == 0){
+  if(length(caLocation) == 0){
     caLocation = "cacert.pem.crt"
   } 
   download.file(url = "http://curl.haxx.se/ca/cacert.pem", 
