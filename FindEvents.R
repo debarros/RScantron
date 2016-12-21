@@ -8,6 +8,7 @@ FindEvents = function (StudentFrame,
     print(paste0("Student ",i," of ",nrow(StudentFrame)))
     sid = StudentFrame$sid[i]
     x = FindEvents_1Student(sid,ScantronHandle)
+    x = x[,-c(2,5,7)] #remove unnecessary columns
     if(nrow(x)>0){
       StNameRep = rep(StudentFrame$StName[i],nrow(x))
       sidRep = rep(sid,nrow(x))
