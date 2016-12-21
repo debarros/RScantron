@@ -7,6 +7,7 @@ library(RCurl)
 library(stringr)
 library(reshape2)
 library(openxlsx)
+library(googlesheets)
 
 #functions
 source("FindDrafts.R")
@@ -25,5 +26,9 @@ source("FindEvents_1Student.R")
 source("FindClasses.R")
 source("ScoreUpdates.R")
 source("FindResults.R")
+source("ObtainNewCert.R")
+source("StoreDrafts.R")
+
+#Data
 TeacherLookup = read.csv(file = "TeacherLookup.csv", stringsAsFactors = FALSE)
-CourseLookup = read.csv(file = "CourseLookup.csv", stringsAsFactors = FALSE)
+CourseLookup = read.xlsx(xlsxFile = "CourseLookup.xlsx",sheet = 1)
