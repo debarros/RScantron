@@ -29,11 +29,11 @@ FindClasses = function(ScantronHandle){
   ClassFrame$ClassName = substr(ClassFrame$Class, 1, unlist(m)-1)
   
   #Use the class and teacher lookup tables to add the abbreviated teacher name, short course name, and academic department
-  ClassFrame$TeacherName = TeacherLookup$TeacherName[match(x = ClassFrame$Primary.Staff, table = TeacherLookup$Primary.Staff)]
-  ClassFrame$Dept = CourseLookup$Dept[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
-  ClassFrame$ShortName = CourseLookup$ShortName[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
-  ClassFrame$Level = CourseLookup$Level[match(x = ClassFrame$ClassName, table = CourseLookup$ClassName)]
-  
+  ClassFrame$TeacherName = TeacherLookup$TeacherName[match(x = ClassFrame$Primary.Staff, table = TeacherLookup$LastFirst)]
+  ClassFrame$Dept = CourseLookup$Dept[match(x = ClassFrame$ClassName, table = CourseLookup$Course.Name)]
+  ClassFrame$ShortName = CourseLookup$ShortName[match(x = ClassFrame$ClassName, table = CourseLookup$Course.Name)]
+  ClassFrame$Level = CourseLookup$Level[match(x = ClassFrame$ClassName, table = CourseLookup$Course.Name)]
+  ClassFrame$Level[is.na(ClassFrame$Level)] = ""
   
   return(ClassFrame)
 } #end of FindClasses() function
