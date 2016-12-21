@@ -13,18 +13,21 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
   # This next section is for debugging when an nrow(x) error pops up
   write(tests, file = "~/testpageoutput.html")
   
+  print(paste0("attempt ",attempt))
   
   #Convert the page to a usable R object
   q = read.csv(textConnection(tests), stringsAsFactors = FALSE) #treat the page as a csv and make a data.frame
-  q = q[,-c(2,5,7)] #remove unnecessary columns
+  print("b")
+  
   
   
   #Recursive call: If the http request got an error page, redo the request
-  print(paste0("length(q) is ",length(q), " and this is Attempt ",attempt))
-  
-  if(length(q) > 10){
+  if(ncol(q) != 7){
+    print("e1")
     q = FindEvents_1Student(sid, ScantronHandle, attempt = attempt+1)
+    print("e2")
   }
   
+  print("h")
   return(q)
 }
