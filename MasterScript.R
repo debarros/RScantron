@@ -114,6 +114,7 @@ DraftFrame = FindDrafts(DraftFolderFrame)
 # Catalog class sections ####
 #Get the complete list of class sections with their class ID's
 ClassFrame = FindClasses(ScantronHandle)
+ClassFrame = ClassFrame[order(ClassFrame$Dept, ClassFrame$ShortName, ClassFrame$Level, ClassFrame$Primary.Staff),]
 write.csv(ClassFrame,file = "ClassSections.csv", row.names = FALSE)
 
 # Catalog all test scores ###
