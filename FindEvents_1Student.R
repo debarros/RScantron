@@ -13,11 +13,11 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
   # This next section is for debugging when an nrow(x) error pops up
   write(tests, file = "~/testpageoutput.html")
   
-  print(paste0("attempt ",attempt))
+  # print(paste0("attempt ",attempt))
   
   #Convert the page to a usable R object
   q = read.csv(textConnection(tests), stringsAsFactors = FALSE) #treat the page as a csv and make a data.frame
-  print("b")
+  # print("b")
   
   
   
@@ -28,6 +28,6 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1){
     print("e2")
   }
   
-  print("h")
+  # print("h")
   return(q)
 }

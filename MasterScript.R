@@ -12,9 +12,9 @@ source("functions.R") #load the functions
 # You should not save this file with your info entered,
 # especially if you plan to contribute to a 
 # public repository.
-username = "sampleUser"
-password = "password1"
-SiteCode = "12-3456-7890"
+# username = "sampleUser"
+# password = "password1"
+# SiteCode = "12-3456-7890"
 caLocation = character()
 SkipTestFolder = "skipTests"
 SkipDraftFolder = "skipDrafts"
@@ -37,7 +37,7 @@ ScantronHandle = login(username, password, SiteCode, caLocation)
 # Get the complete list of tests with their test ID's and containing folders
 TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
 TestFrame = FindTests(TestFolderFrame)
-OldTestFrame = readWorkbook(xlsxFile = "C:/Users/pauldeba/Documents/Everything/data drive/weekly tests/2016-2017/export link creator.xlsx", sheet = "tests")
+OldTestFrame = readWorkbook(xlsxFile = "J:/tests/2016-2017/export link creator.xlsx", sheet = "tests")
 NewTestFrame = rbind.data.frame(OldTestFrame, TestFrame[,c(1,3,2)])
 NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]
 NewTestFrame = NewTestFrame[order(NewTestFrame$TestName),]
@@ -49,21 +49,54 @@ StudentFrame = FindStudents(ScantronHandle)
 # Get the complete list of instances in which a student has taken a test
 EventFrame = FindEvents(StudentFrame, ScantronHandle)
 
+
 # Get a list of the recently scanned instances
-RecentDays = 3
+# RecentDays = 7
 #enter the date modified of recentScores.R.  If more bubble sheets could have been scanned that day, enter the day before.
-LastTime = as.Date("2016-12-19")  
-RecentDays = as.integer(Sys.Date() - LastTime)
-RecentEventFrame = FindRecentEvents(EventFrame, RecentDays)
+#LastTime = as.Date("2017-04-03")  
+#LastTime = as.Date(file.mtime("recentScores.csv"))
+#RecentDays = as.integer(Sys.Date() - LastTime)
+# RecentEventFrame = FindRecentEvents(EventFrame, RecentDays)
 #View(RecentEventFrame)
+
+# Compare new event frame to old event frame and subset to the recent events
+#This should be encaspulated as a function with a parameter about whether to include score changes
+PriorEventFrame = read.csv("eventFrame.csv", stringsAsFactors = F) #read in existing events
+write.csv(x = EventFrame, file = "eventFrame.csv", row.names = F) #store the complete events
+IDcolumns = colnames(EventFrame)
+IDcolumns = IDcolumns[!(IDcolumns %in% c("Score"))]
+PriorEventFrame$identifier = apply(PriorEventFrame[IDcolumns], MARGIN = 1, FUN = paste0, collapse = "-")
+EventFrame$identifier = apply(EventFrame[IDcolumns], MARGIN = 1, FUN = paste0, collapse = "-")
+RecentEventFrame = EventFrame[!(EventFrame$identifier %in% PriorEventFrame$identifier),1:(ncol(EventFrame)-1)]
+RecentEventFrame = RecentEventFrame[RecentEventFrame$Status == "Finished", ]
 
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame)
 View(RecentTestFrame)
 
+
+
+
+
+
+
+
+
+
+
 #Create output of the scores that need quick updates or reports
 cap = 5 #only tests with fewer than cap new scores will be included in the quick updates
 ScoreUpdates(RecentEventFrame, RecentTestFrame, cap)
+
+
+
+
+
+
+
+
+
+
 
 # Catalog Draft Tests ####
 # Get the complete list of folders with their folder ID's
@@ -76,7 +109,7 @@ DraftFrame = FindDrafts(DraftFolderFrame)
 
 # Get the page showing the content of each draft
 # If you have a lot of drafts, include the parameter MaxDrafts = n (where n is some small integer)
-DraftFrame = StoreDrafts(DraftFrame)
+ DraftFrame = StoreDrafts(DraftFrame)
 
 # Catalog class sections ####
 #Get the complete list of class sections with their class ID's
