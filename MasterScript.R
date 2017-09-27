@@ -2,46 +2,29 @@
 # by Paul de Barros (pj.deBarros@gmail.com)
 # Repository located at https://github.com/debarros/RScantron
 
-#Note: you must set the List Items per Page to "unlimited" in the account you use
-
-# Initialize ####
+#------------------#
+#### Initialize ####
+#------------------#
 gc() #garbage collection clears data no longer being used from memory
 source("functions.R") #load the functions
-
-# You can enter the info here, but be careful.
-# You should not save this file with your info entered,
-# especially if you plan to contribute to a 
-# public repository.
-# username = "sampleUser"
-# password = "password1"
-# SiteCode = "12-3456-7890"
-caLocation = character()
-SkipTestFolder = "skipTests"
-SkipDraftFolder = "skipDrafts"
-SkipSessionFolder = "skipSessions"
-
-# To avoid committing and sharing credentials, 
-# create a file called credentials.R and 
-# store the info there.  Git will ignore it,
-# so you won't accidentally share it.
 source("credentials.R") 
 
-# Log in to the site ####
-# Use the first line if you have set the parameters, 
-# and the second to enter them at a prompt
+
+#--------------#
+#### Log in ####
+#--------------#
+
+# log in to scantron
 ScantronHandle = login(username, password, SiteCode, caLocation)
-#ScantronHandle = login()
+
+# Sign in to google
+gs_auth() # this might launch a browser so you can sign into your account
+ScannedTests.url = gs_url("https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit") #enter the URL of the scanned test document here
 
 
-# Determine current reporting needs ####
-# Get the complete list of tests with their test ID's and containing folders
-TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
-TestFrame = FindTests(TestFolderFrame)
-OldTestFrame = readWorkbook(xlsxFile = "J:/tests/2016-2017/export link creator.xlsx", sheet = "tests")
-NewTestFrame = rbind.data.frame(OldTestFrame, TestFrame[,c(1,3,2)])
-NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]
-NewTestFrame = NewTestFrame[order(NewTestFrame$TestName),]
-write.csv(NewTestFrame, file = "TestFrame.csv", row.names = FALSE)
+#-----------------------------------------#
+#### Determine current reporting needs ####
+#-----------------------------------------#
 
 # Get the complete list of students
 StudentFrame = FindStudents(ScantronHandle)
@@ -49,20 +32,10 @@ StudentFrame = FindStudents(ScantronHandle)
 # Get the complete list of instances in which a student has taken a test
 EventFrame = FindEvents(StudentFrame, ScantronHandle)
 
-
-# Get a list of the recently scanned instances
-# RecentDays = 7
-#enter the date modified of recentScores.R.  If more bubble sheets could have been scanned that day, enter the day before.
-#LastTime = as.Date("2017-04-03")  
-#LastTime = as.Date(file.mtime("recentScores.csv"))
-#RecentDays = as.integer(Sys.Date() - LastTime)
-# RecentEventFrame = FindRecentEvents(EventFrame, RecentDays)
-#View(RecentEventFrame)
-
 # Compare new event frame to old event frame and subset to the recent events
 #This should be encaspulated as a function with a parameter about whether to include score changes
-PriorEventFrame = read.csv("eventFrame.csv", stringsAsFactors = F) #read in existing events
-write.csv(x = EventFrame, file = "eventFrame.csv", row.names = F) #store the complete events
+PriorEventFrame = gs_read(ss = ScannedTests.url, ws = "Events") #read in existing events
+gs_edit_cells(ss = ScannedTests.url, ws = "Events", input = EventFrame, anchor = "A1") #store the complete events
 IDcolumns = colnames(EventFrame)
 IDcolumns = IDcolumns[!(IDcolumns %in% c("Score"))]
 PriorEventFrame$identifier = apply(PriorEventFrame[IDcolumns], MARGIN = 1, FUN = paste0, collapse = "-")
@@ -72,57 +45,66 @@ RecentEventFrame = RecentEventFrame[RecentEventFrame$Status == "Finished", ]
 
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame)
-View(RecentTestFrame)
 
+# Read in the TAB (Test Address Book)
+TAB = read.xlsx(xlsxFile = "J:/tests/2017-2018/TAB.xlsx")
 
+# Check for tests not included in the tab
+missingTests = RecentTestFrame$TestName[!(RecentTestFrame$TestName %in% TAB$TestName)]
+print(missingTests)
+if(length(missingTests) > 0){ # If there are any missing tests, add them to the TAB
+  write.csv(x = RecentTestFrame[!(RecentTestFrame$TestName %in% TAB$TestName), c("TestID", "TestName")], file = "addtoTAB.csv")
+}
+if(length(missingTests) > 0){ # After adding them to the tab, reload it
+  TAB = read.xlsx(xlsxFile = "J:/tests/2017-2018/TAB.xlsx")
+}
 
+# Download the item response files and save them
+for(i in 1:nrow(RecentTestFrame)){
+  # determine the courses associated with this test
+  # determine the sections of this course
+  for(i in sections){
+    # get the ClassID for the section
+    # download the item response file
+    # store it in the exports folder
+  }
+}
 
-
-
-
-
-
-
-
-#Create output of the scores that need quick updates or reports
-cap = 5 #only tests with fewer than cap new scores will be included in the quick updates
-ScoreUpdates(RecentEventFrame, RecentTestFrame, cap)
-
-
-
-
-
-
-
-
-
-
-
-# Catalog Draft Tests ####
-# Get the complete list of folders with their folder ID's
-DraftFolderFrame = FindFolders(ScantronHandle, "d", SkipDraftFolder)
-SessionFolderFrame = FindFolders(ScantronHandle, "s", SkipSessionFolder)
-
-
-# Get the complete list of test drafts with their test ID's and containing folders
-DraftFrame = FindDrafts(DraftFolderFrame)
-
-# Get the page showing the content of each draft
-# If you have a lot of drafts, include the parameter MaxDrafts = n (where n is some small integer)
- DraftFrame = StoreDrafts(DraftFrame)
-
-# Catalog class sections ####
-#Get the complete list of class sections with their class ID's
-ClassFrame = FindClasses(ScantronHandle)
-ClassFrame = ClassFrame[order(ClassFrame$Dept, ClassFrame$ShortName, ClassFrame$Level, ClassFrame$Primary.Staff),]
-write.csv(ClassFrame,file = "ClassSections.csv", row.names = FALSE)
-
-# Catalog all test scores ###
-#Compile all scores ever
-testIDs = TestFrame$tid
-AllResults = FindResults(testIDs, ScantronHandle)
-
-
-# Log out of the system ####
+# Log out of the scantron ####
 LogoutPage = logout(ScantronHandle)
 
+# Generate the reports
+for(i in 1:nrow(RecentTestFrame)){
+  generateReport(DataLocation = TAB$Folder.location[TAB$TestName == RecentTestFrame$TestName[i]])
+}
+
+
+#--------------------------#
+#### Monitoring section ####
+#--------------------------#
+
+# Get the current Scanned Tests document and then clear it out
+ScannedTests = gs_read(ss = ScannedTests.url, ws = 1)
+if(nrow(ScannedTests) > 0){
+  Blank = matrix(data = "", nrow = nrow(ScannedTests), ncol = ncol(ScannedTests)) 
+  gs_edit_cells(ss = ScannedTests.url, ws = 1, input = Blank, anchor = "A2") # Start at A2 to leave the header row in place
+}
+
+# Modify ScannedTests to include the newly scanned tests
+NewScannedTests = data.frame(Test = RecentTestFrame$TestName, Folder = TAB$Folder.location[match(RecentTestFrame$TestName,TAB$TestName)], Analyze = T, Update = F, Monitor = T)
+AllScannedTests = rbind(ScannedTests, NewScannedTests)
+UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
+for(i in 1:nrow(UniqueScannedTests)){
+  for(j in c("Analyze","Update","Monitor")){
+    UniqueScannedTests[1,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
+  }
+}
+
+# Remove from UniqueScannedTests any records that require no action
+UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("Analyze","Update","Monitor")], MARGIN = 1, FUN = any),]
+
+# Update the Scanned Tests document with the modified ScannedTests 
+gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1") # Start at A1 b/c the header row is also added
+
+# store the date and time of the current run
+gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
