@@ -30,5 +30,5 @@ source("ObtainNewCert.R")
 source("StoreDrafts.R")
 
 #Data
-TeacherLookup = read.csv(file = "TeacherLookup.csv", stringsAsFactors = FALSE)
-CourseLookup = read.xlsx(xlsxFile = "CourseLookup.xlsx",sheet = 1)
+TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "TeacherLookup")
+CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
