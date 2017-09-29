@@ -8,6 +8,8 @@ library(stringr)
 library(reshape2)
 library(openxlsx)
 library(googlesheets)
+library(rrttReportBuilder)
+library(dBtools)
 
 #functions
 source("FindDrafts.R")
