@@ -3,8 +3,8 @@
 FindResults_1test = function(tid, ScantronHandle, attempt = 1){
   scores = getURI(
     paste0(
-      'https://admin.achievementseries.com/published-test/export/csv-list.csv?id=',
-      tid,
+      'https://admin.achievementseries.com/published-test/export/csv-list.csv?',
+      'id=',tid,
       '&d=F&t=T&r=F&p=F&_list=ExportList'),
     curl=ScantronHandle)
   q = read.csv(textConnection(scores), stringsAsFactors = FALSE) #treat the page to a csv and make a data.frame
