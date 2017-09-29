@@ -19,7 +19,7 @@ ScantronHandle = login(username, password, SiteCode, caLocation)
 
 # Sign in to google
 gs_auth() # this might launch a browser so you can sign into your account
-ScannedTests.url = gs_url("https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit") #enter the URL of the scanned test document here
+ScannedTests.url = gs_url(ScannedTests.url.text) #enter the URL of the scanned test document here
 
 
 #-----------------------------------------#
@@ -35,41 +35,57 @@ RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, url = ScannedTests.
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame)
 
-# Read in the TAB (Test Address Book)
-TAB = read.xlsx(xlsxFile = "J:/tests/2017-2018/TAB.xlsx")
-
 # Check for tests not included in the tab
 missingTests = RecentTestFrame$Published.Test[!(RecentTestFrame$Published.Test %in% TAB$TestName)]
 print(missingTests)
-if(length(missingTests) > 0){ # If there are any missing tests, add them to the TAB
+
+# If there are any missing tests, add them to the TAB
+if(length(missingTests) > 0){ 
   # Get the complete list of tests with their test ID's and containing folders
   TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
   TestFrame = FindTests(TestFolderFrame)
   TestFrame$Local.folder = NA_character_
-  OldTestFrame = readWorkbook(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "TAB")
   TestFrame = TestFrame[,c(3,1,2,4)]
-  colnames(TestFrame) = colnames(OldTestFrame)
-  NewTestFrame = rbind.data.frame(OldTestFrame, TestFrame)
+  colnames(TestFrame) = colnames(TAB)
+  NewTestFrame = rbind.data.frame(TAB, TestFrame)
   NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]
   NewTestFrame = NewTestFrame[order(NewTestFrame$TestName),]
   for(i in 1:ncol(NewTestFrame)){
     NewTestFrame[,i] = na.to.empty(NewTestFrame[,i])
   }
-  write.csv(NewTestFrame, file = "TestFrame.csv", row.names = FALSE)
-
-    
+  writeData(wb = TAB.wb, sheet = "TAB", x = NewTestFrame)
+  saveWorkbook(wb = TAB.wb, file = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", overwrite = T)
 }
 
-TAB = read.xlsx(xlsxFile = "J:/tests/2017-2018/TAB.xlsx")
+#Reload the TAB
+TAB = readWorkbook(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "TAB")
 
 # Download the item response files and save them
+
 for(i in 1:nrow(RecentTestFrame)){
-  # determine the courses associated with this test
+  # Get the current test name, code, and id
+  testname = as.character(RecentTestFrame$Published.Test[i])
+  testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
+  testid = TestFrame$TestID[TestFrame$TestName == testname]
+  testpath = TAB$Local.folder[TAB$TestID == testid]
+  
+  # determine the courses associated with this test code
+  coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
+  courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
+  
   # determine the sections of this course
-  for(i in sections){
-    # get the ClassID for the section
+  currentSections = Sections[Sections$ClassName %in% courses,]
+  
+  for(j in 1:nrow(currentSections)){
+    currentClassID = currentSections$ClassID[j] # get the ClassID for the section
+    currentClassName = paste0(currentSections$TeacherName[j],"_p", currentSections$Period[j])
+    
     # download the item response file
+    currentresponses = GetItemResponses(ClassID = currentClassID, TestID = testid, curlhandle = ScantronHandle)
+    
     # store it in the exports folder
+    StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
+    
   }
 }
 
