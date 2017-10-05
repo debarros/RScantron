@@ -1,7 +1,7 @@
 #Get Item Responses
 
 GetItemResponses = function(ClassID, TestID, curlhandle){
-  responses = getBinaryURL(
+  responses = getURI(
     paste0(
       "https://admin.achievementseries.com/report/class/responses.csv?",
       "c=", ClassID, 
