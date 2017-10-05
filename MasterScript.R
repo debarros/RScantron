@@ -30,10 +30,15 @@ StudentFrame = FindStudents(ScantronHandle) # Get the complete list of students
 EventFrame = FindEvents(StudentFrame, ScantronHandle, schoolYear()) # Get the complete list of instances in which a student has taken a test
 
 # Compare new event frame to old event frame and subset to the recent events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, url = ScannedTests.url, ws = "Events", status = "Finished")
+RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished")
 
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame)
+
+# Get the complete list of tests with their test ID's and containing folders
+TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
+TestFrame = FindTests(TestFolderFrame)
+
 
 # Check for tests not included in the tab
 missingTests = RecentTestFrame$Published.Test[!(RecentTestFrame$Published.Test %in% TAB$TestName)]
@@ -41,9 +46,6 @@ print(missingTests)
 
 # If there are any missing tests, add them to the TAB
 if(length(missingTests) > 0){ 
-  # Get the complete list of tests with their test ID's and containing folders
-  TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
-  TestFrame = FindTests(TestFolderFrame)
   TestFrame$Local.folder = NA_character_
   TestFrame = TestFrame[,c(3,1,2,4)]
   colnames(TestFrame) = colnames(TAB)
@@ -58,16 +60,15 @@ if(length(missingTests) > 0){
 }
 
 #Reload the TAB
-TAB = readWorkbook(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "TAB")
+TAB = readWorkbook(xlsxFile = TABpath, sheet = "TAB")
 
 # Download the item response files and save them
-
 for(i in 1:nrow(RecentTestFrame)){
   # Get the current test name, code, and id
   testname = as.character(RecentTestFrame$Published.Test[i])
   testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
-  testid = TestFrame$TestID[TestFrame$TestName == testname]
-  testpath = TAB$Local.folder[TAB$TestID == testid]
+  testid = TestFrame$tid[TestFrame$TestName == testname]
+  testpath = TAB$Local.folder[TAB$TestID == testid][1]
   
   # determine the courses associated with this test code
   coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
@@ -85,19 +86,17 @@ for(i in 1:nrow(RecentTestFrame)){
     
     # store it in the exports folder
     StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
-    
-  }
-}
+  } #/for each section
+} #/for each reportable test
 
 # Log out of scantron
 LogoutPage = logout(ScantronHandle)
 
 # Generate the reports
 for(i in 1:nrow(RecentTestFrame)){
-  DataLocation = TAB$Folder.location[TAB$TestName == RecentTestFrame$TestName[i]]
-  generateReport(DataLocation = DataLocation, TMS = ScantronAS)
+  DataLocation = TAB$Local.folder[TAB$TestName == RecentTestFrame$Published.Test[i]]
+  generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 }
-
 
 #--------------------------#
 #### Monitoring section ####
@@ -111,12 +110,19 @@ if(nrow(ScannedTests) > 0){
 }
 
 # Modify ScannedTests to include the newly scanned tests
-NewScannedTests = data.frame(Test = RecentTestFrame$TestName, Folder = TAB$Folder.location[match(RecentTestFrame$TestName,TAB$TestName)], Analyze = T, Update = F, Monitor = T)
+NewScannedTests = data.frame(Test = RecentTestFrame$Published.Test, Folder = TAB$Local.folder[match(RecentTestFrame$Published.Test,TAB$TestName)])
+if(nrow(NewScannedTests) > 0){
+  NewScannedTests$Analyze = T
+  NewScannedTests$Update = F
+  NewScannedTests$Monitor = T
+}
+
+
 AllScannedTests = rbind(ScannedTests, NewScannedTests)
 UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
 for(i in 1:nrow(UniqueScannedTests)){
   for(j in c("Analyze","Update","Monitor")){
-    UniqueScannedTests[1,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
+    UniqueScannedTests[i,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
   }
 }
 
@@ -127,4 +133,4 @@ UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("Analyze
 gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1") # Start at A1 b/c the header row is also added
 
 # store the date and time of the current run
-gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
+# gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
