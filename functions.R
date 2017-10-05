@@ -35,16 +35,17 @@ source("GetItemResponses.R")
 source("StoreItemResponses.R")
 
 #Data
+TABpath = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx"
 TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "TeacherLookup")
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
-Coursecode2Testcode = read.xlsx(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "Course Codes", startRow = 2)
-Sections = read.xlsx(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "Sections")
+Coursecode2Testcode = read.xlsx(xlsxFile = TABpath, sheet = "Course Codes", startRow = 2)
+Sections = read.xlsx(xlsxFile = TABpath, sheet = "Sections")
 Coursecode2Course = set_colnames(
   x = as.data.frame(
-    t(read.xlsx(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", 
+    t(read.xlsx(xlsxFile = TABpath, 
                 sheet = "Course Codes", colNames = F, rowNames = F, rows = 1:2)), 
     stringsAsFactors = F), 
   value = c("Course","CourseCode"))
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
-TAB = readWorkbook(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", sheet = "TAB") # Read in the TAB (Test Address Book)
-TAB.wb = loadWorkbook(xlsxFile = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx")
+TAB = readWorkbook(xlsxFile = TABpath, sheet = "TAB") # Read in the TAB (Test Address Book)
+TAB.wb = loadWorkbook(xlsxFile = TABpath)
