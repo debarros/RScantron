@@ -46,6 +46,7 @@ print(missingTests)
 
 # If there are any missing tests, add them to the TAB
 if(length(missingTests) > 0){ 
+  TestFrame.temp = TestFrame
   TestFrame$Local.folder = NA_character_
   TestFrame = TestFrame[,c(3,1,2,4)]
   colnames(TestFrame) = colnames(TAB)
@@ -57,7 +58,8 @@ if(length(missingTests) > 0){
   }
   writeData(wb = TAB.wb, sheet = "TAB", x = NewTestFrame)
   saveWorkbook(wb = TAB.wb, file = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx", overwrite = T)
-}
+  TestFrame = TestFrame.temp
+} # /if there are missing tests
 
 #Reload the TAB
 TAB = readWorkbook(xlsxFile = TABpath, sheet = "TAB")
