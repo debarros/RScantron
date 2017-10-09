@@ -1,6 +1,7 @@
 #FindRecentEvents function
 
-FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = NULL, newScores = T, status = c("Finished"), startcell = "A1"){
+FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = NULL, newScores = T, 
+                            status = c("Finished"), startcell = "A1", updatePriorEvents = T){
   
   if(!is.null(RecentDays)){
     RecentEventFrame = EventFrame[which(EventFrame$Date >= Sys.Date()-(RecentDays - 1)),]
@@ -23,8 +24,10 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
     TABpath = TAB[[2]]
     PriorEventFrame = read.xlsx(xlsxFile = TABpath, sheet = "Events") #read in existing events
     PriorEventFrame$Date = as.Date(PriorEventFrame$Date, origin = "1899-12-30")
+    if(updatePriorEvents){ # If the table of prior events is to be updated in the TAB, do so.
     writeData(wb = TAB.wb, sheet = "Events", x = EventFrame) #store the complete events
     saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
+    }
     return(FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status))
     
   } else {
