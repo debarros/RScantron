@@ -2,7 +2,7 @@
 
 # This process requires a few files
 # Export all current students from PowerSchool
-# Export all course assignments from PowerSchool
+# Export all course assignments from PowerSchool (cc table)
 
 source("functions.R") #load the functions
 
