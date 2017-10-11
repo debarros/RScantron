@@ -1,6 +1,60 @@
 #Get Item Responses
 
-GetItemResponses = function(ClassID, TestID, curlhandle){
+GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB, ScantronHandle, Coursecode2Testcode, Coursecode2Course, Sections){
+  for(i in 1:nrow(RecentTestFrame)){
+    # Get the current test name, code, and id
+    testname = as.character(RecentTestFrame$Published.Test[i])
+    testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
+    testid = TestFrame$tid[TestFrame$TestName == testname]
+    testpath = TAB$Local.folder[TAB$TestID == testid][1]
+    
+    # determine the courses associated with this test code
+    coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
+    courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
+    
+    # determine the sections of this course
+    currentSections = Sections[Sections$ClassName %in% courses,]
+    classIDs = currentSections$ClassID
+    classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
+    GetAndStoreItemResponses_1test(classIDs, classnames, testid, testpath, ScantronHandle)
+    
+  } #/for each reportable test
+}
+
+
+
+GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, ScantronHandle){
+  for(j in 1:length(classIDs)){
+    currentClassID = classIDs[j] # get the ClassID for the section
+    currentClassName = classnames[j]
+    
+    # download the item response file
+    currentresponses = GetItemResponses_1section(ClassID = currentClassID, TestID = testid, curlhandle = ScantronHandle)
+    
+    # store it in the exports folder
+    StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
+  } #/for each section
+}
+
+
+GetAndStoreItemResponses_SingleTest = function(testname, TAB, Coursecode2Testcode, Coursecode2Course){
+  testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
+  testid = TAB$TestID[TAB$TestName == testname][1]
+  testpath = TAB$Local.folder[TAB$TestID == testid][1]
+  
+  # determine the courses associated with this test code
+  coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
+  courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
+  currentSections = Sections[Sections$ClassName %in% courses,]
+  classIDs = currentSections$ClassID
+  classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
+  GetAndStoreItemResponses_1test(classIDs, classnames, testid, testpath, ScantronHandle)
+}
+
+
+
+
+GetItemResponses_1section = function(ClassID, TestID, curlhandle){
   responses = getURI(
     paste0(
       "https://admin.achievementseries.com/report/class/responses.csv?",
