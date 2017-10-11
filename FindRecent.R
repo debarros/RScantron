@@ -53,6 +53,10 @@ FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, stat
 
 #FindRecentTests function
 FindRecentTests = function(RecentEventFrame){
+  if(nrow(RecentEventFrame) == 0){
+    print("There are no recent tests.")
+    return(NULL)
+  }
   RecentTestFrame = data.frame(Published.Test = unique(RecentEventFrame$Published.Test))
   RecentTestFrame$Date = as.Date(NA)
   for (i in 1:nrow(RecentTestFrame)){
