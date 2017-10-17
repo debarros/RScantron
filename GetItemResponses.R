@@ -1,6 +1,14 @@
 #Get Item Responses
 
 GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB, ScantronHandle, Coursecode2Testcode, Coursecode2Course, Sections){
+  # Check for testcodes missing from the TAB
+  testnames = as.character(RecentTestFrame$Published.Test)
+  testcodes = unique(substr(testnames, start = 1, stop = regexpr(pattern = " ", text = testnames) - 1))
+  testcodes = testcodes[!(testcodes %in% Coursecode2Testcode$testcode)]
+  if(length(testcodes) > 0){
+    stop(paste0("The Course Codes tab of the TAB needs rows for the following:"), paste0(testcodes, collapse = ", "))
+  }
+  
   for(i in 1:nrow(RecentTestFrame)){
     # Get the current test name, code, and id
     testname = as.character(RecentTestFrame$Published.Test[i])
