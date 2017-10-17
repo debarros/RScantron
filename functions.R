@@ -41,6 +41,7 @@ TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "Te
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
 Coursecode2Testcode = read.xlsx(xlsxFile = TABpath, sheet = "Course Codes", startRow = 2)
 Sections = read.xlsx(xlsxFile = TABpath, sheet = "Sections")
+Sections$Level[is.na(Sections$Level)] = ""
 Coursecode2Course = set_colnames(
   x = as.data.frame(
     t(read.xlsx(xlsxFile = TABpath, 
