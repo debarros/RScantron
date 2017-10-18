@@ -49,8 +49,8 @@ TAB = read.xlsx(xlsxFile = TABpath, sheet = "TAB")
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB, ScantronHandle, Coursecode2Testcode, Coursecode2Course, Sections, CustomSectioning)
-# GetAndStoreItemResponses_SingleTest(testname = "Gv (2017-10-05) Constitution and Bill of Rights", TAB, Coursecode2Testcode, Coursecode2Course)
-  
+# GetAndStoreItemResponses_SingleTest(testname = "Gv (2017-10-05) Constitution and Bill of Rights", TAB, Coursecode2Testcode, Coursecode2Course, CustomSectioning, Sections)
+
 # Log out of scantron
 LogoutPage = logout(ScantronHandle)
 
