@@ -51,3 +51,4 @@ Coursecode2Course = set_colnames(
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
 TAB = readWorkbook(xlsxFile = TABpath, sheet = "TAB") # Read in the TAB (Test Address Book)
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
+CustomSectioning = read.xlsx(xlsxFile = TABpath, sheet = "CustomSectioning")
