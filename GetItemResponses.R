@@ -24,8 +24,8 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB, ScantronHan
     classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
     GetAndStoreItemResponses_1test(currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
     
-  } #/for each reportable test
-}
+  } # /for each reportable test
+} # /GetAndStoreItemResponses
 
 
 
@@ -40,7 +40,8 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     # store it in the exports folder
     StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
   } # /for each section
-}
+} # /GetAndStoreItemResponses_1test
+
 
 
 GetAndStoreItemResponses_SingleTest = function(testname, TAB, Coursecode2Testcode, Coursecode2Course, CustomSectioning, Sections){
@@ -50,8 +51,7 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB, Coursecode2Testcod
   currentSections = DetermineCurrentSections(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course)
   classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
   GetAndStoreItemResponses_1test(currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
-}
-
+} # /GetAndStoreItemResponses_SingleTest
 
 
 
@@ -66,25 +66,3 @@ GetItemResponses_1section = function(ClassID, TestID, curlhandle){
   responses = gsub(pattern = "\r\n", replacement = "\n",x = responses) # replace CRLF with LF to avoid blank lines
   return(responses)
 } # /GetItemResponses
-
-
-
-
-
-DetermineCurrentSections = function(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course){
-  
-  # Determine the sections for this test code
-  if(testname %in% CustomSectioning$TestTitle){ # if there are custom sections, just get those
-    classIDs = CustomSectioning$ClassID_List[CustomSectioning$TestTitle == testname]
-    classIDs = strsplit(x = classIDs, split = ",")[[1]] # strsplit returns a list, but we just want the contents of the list, hence the [[1]]
-    currentSections = Sections[Sections$ClassID %in% classIDs,]
-  } else { # if there are no custom sections
-    # Determine the courses associated with this test code
-    coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
-    courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
-    # Get all the sections of those courses
-    currentSections = Sections[Sections$ClassName %in% courses,]
-  } # /if-else to determine sections
-  
-  return(currentSections)
-}

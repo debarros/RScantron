@@ -34,6 +34,7 @@ source("StoreDrafts.R")
 source("GetItemResponses.R")
 source("StoreItemResponses.R")
 source("UpdateTab.R")
+source("DetermineCurrentSections.R")
 
 #Data
 TABpath = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx"
