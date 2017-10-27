@@ -22,10 +22,10 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
     }
     TAB.wb = TAB[[1]]
     TABpath = TAB[[2]]
-    PriorEventFrame = read.xlsx(xlsxFile = TABpath, sheet = "Events") #read in existing events
+    PriorEventFrame = read.xlsx(xlsxFile = TABpath, sheet = "Events")          # read in existing events
     PriorEventFrame$Date = as.Date(PriorEventFrame$Date, origin = "1899-12-30")
-    if(updatePriorEvents){ # If the table of prior events is to be updated in the TAB, do so.
-      writeData(wb = TAB.wb, sheet = "Events", x = EventFrame) #store the complete events
+    if(updatePriorEvents){                                                     # If the table of prior events is to be updated in the TAB, do so.
+      writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 # store the complete events
       saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
     }
     return(FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status))

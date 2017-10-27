@@ -1,6 +1,17 @@
 #Get Item Responses
 
-GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB, ScantronHandle, Coursecode2Testcode, Coursecode2Course, Sections, CustomSectioning){
+GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle){
+  Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
+  Coursecode2Course =  set_colnames(
+    x = as.data.frame(
+      t(read.xlsx(xlsxFile = TAB.wb, 
+                  sheet = "Course Codes", colNames = F, rowNames = F, rows = 1:2)), 
+      stringsAsFactors = F), 
+    value = c("Course","CourseCode"))
+  Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
+  Sections$Level[is.na(Sections$Level)] = ""
+  CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
+  
   # Check for testcodes missing from the TAB
   testnames = as.character(RecentTestFrame$Published.Test)
   testcodes = unique(substr(testnames, start = 1, stop = regexpr(pattern = " ", text = testnames) - 1))
@@ -44,7 +55,18 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
 
 
 
-GetAndStoreItemResponses_SingleTest = function(testname, TAB, Coursecode2Testcode, Coursecode2Course, CustomSectioning, Sections){
+GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb){
+  Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
+  Coursecode2Course =  set_colnames(
+    x = as.data.frame(
+      t(read.xlsx(xlsxFile = TAB.wb, 
+                  sheet = "Course Codes", colNames = F, rowNames = F, rows = 1:2)), 
+      stringsAsFactors = F), 
+    value = c("Course","CourseCode"))
+  Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
+  Sections$Level[is.na(Sections$Level)] = ""
+  CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
+  
   testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
   testid = TAB$TestID[TAB$TestName == testname][1]
   testpath = TAB$Local.folder[TAB$TestID == testid][1]

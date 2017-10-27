@@ -40,16 +40,7 @@ source("DetermineCurrentSections.R")
 TABpath = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx"
 TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "TeacherLookup")
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
-Coursecode2Testcode = read.xlsx(xlsxFile = TABpath, sheet = "Course Codes", startRow = 2)
-Sections = read.xlsx(xlsxFile = TABpath, sheet = "Sections")
-Sections$Level[is.na(Sections$Level)] = ""
-Coursecode2Course = set_colnames(
-  x = as.data.frame(
-    t(read.xlsx(xlsxFile = TABpath, 
-                sheet = "Course Codes", colNames = F, rowNames = F, rows = 1:2)), 
-    stringsAsFactors = F), 
-  value = c("Course","CourseCode"))
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
-TAB = readWorkbook(xlsxFile = TABpath, sheet = "TAB") # Read in the TAB (Test Address Book)
-TAB.wb = loadWorkbook(xlsxFile = TABpath)
+TAB.wb = loadWorkbook(xlsxFile = TABpath) # Read in the TAB (Test Address Book)
 CustomSectioning = read.xlsx(xlsxFile = TABpath, sheet = "CustomSectioning")
+

@@ -1,6 +1,7 @@
 #UpdateTab.R
 
-UpdateTab = function(missingTests, TestFrame, TAB, TAB.wb, TABpath){
+UpdateTab = function(missingTests, TestFrame, TAB.wb, TABpath){
+  TAB = read.xlsx(xlsxFile = TAB.wb, sheet = "TAB")
   if(length(missingTests) > 0){ 
     TestFrame.temp = TestFrame
     TestFrame$Local.folder = NA_character_
@@ -16,3 +17,5 @@ UpdateTab = function(missingTests, TestFrame, TAB, TAB.wb, TABpath){
     saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
   } # /if there are missing tests
 } # /function
+
+

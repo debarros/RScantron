@@ -29,7 +29,7 @@ StudentFrame = FindStudents(ScantronHandle) # Get the complete list of students
 EventFrame = FindEvents(StudentFrame, ScantronHandle, schoolYear()) # Get the complete list of instances in which a student has taken a test
 
 # Compare new event frame to old event frame and subset to the recent events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T)
+RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F)
 # RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, RecentDays = 5, status = "Finished", updatePriorEvents = F)
 
 #Get a list of the recently scanned tests, and how many instances per test
@@ -40,24 +40,25 @@ TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
 TestFrame = FindTests(TestFolderFrame)
 
 # Check for tests not included in the tab
-missingTests = RecentTestFrame$Published.Test[!(RecentTestFrame$Published.Test %in% TAB$TestName)]
+missingTests = RecentTestFrame$Published.Test[!(RecentTestFrame$Published.Test %in% read.xlsx(TAB.wb)$TestName)]
 print(missingTests)
 
 # If there are any missing tests, add them to the TAB and reload it
-UpdateTab(missingTests, TestFrame, TAB, TAB.wb, TABpath)
-TAB = read.xlsx(xlsxFile = TABpath, sheet = "TAB")
+UpdateTab(missingTests, TestFrame, TAB.wb, TABpath)
+TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
-GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB, ScantronHandle, Coursecode2Testcode, Coursecode2Course, Sections, CustomSectioning)
-# GetAndStoreItemResponses_SingleTest(testname = "Gv (2017-10-05) Constitution and Bill of Rights", TAB, Coursecode2Testcode, Coursecode2Course, CustomSectioning, Sections)
+GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle)
+# GetAndStoreItemResponses_SingleTest(testname = "Bio (2017-10-12) Pop Eco Human Impact Unit", TAB.wb)
 
 # Log out of scantron
 LogoutPage = logout(ScantronHandle)
 
 # Generate the reports
+
 for(i in 1:nrow(RecentTestFrame)){
   print(i)
-  DataLocation = TAB$Local.folder[TAB$TestName == RecentTestFrame$Published.Test[i]]
+  DataLocation = read.xslx(TAB.wb)$Local.folder[read.xslx(TAB.wb)$TestName == RecentTestFrame$Published.Test[i]]
   generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 }
 
@@ -78,7 +79,9 @@ if(nrow(ScannedTests) > 0){
 }
 
 # Modify ScannedTests to include the newly scanned tests
-NewScannedTests = data.frame(Test = RecentTestFrame$Published.Test, Folder = TAB$Local.folder[match(RecentTestFrame$Published.Test,TAB$TestName)])
+NewScannedTests = data.frame(
+  Test = RecentTestFrame$Published.Test, 
+  Folder = read.xslx(TAB.wb)$Local.folder[match(RecentTestFrame$Published.Test,read.xslx(TAB.wb)$TestName)])
 if(nrow(NewScannedTests) > 0){
   NewScannedTests$MakeReport = F
   NewScannedTests$SendReport = T
@@ -102,4 +105,7 @@ UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("MakeRep
 gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1") # Start at A1 b/c the header row is also added
 
 # store the date and time of the current run
-# gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
+gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
+
+# update prior events
+RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T)
