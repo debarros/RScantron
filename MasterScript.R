@@ -58,7 +58,7 @@ LogoutPage = logout(ScantronHandle)
 
 for(i in 1:nrow(RecentTestFrame)){
   print(i)
-  DataLocation = read.xslx(TAB.wb)$Local.folder[read.xslx(TAB.wb)$TestName == RecentTestFrame$Published.Test[i]]
+  DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == RecentTestFrame$Published.Test[i]]
   generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 }
 
@@ -81,7 +81,7 @@ if(nrow(ScannedTests) > 0){
 # Modify ScannedTests to include the newly scanned tests
 NewScannedTests = data.frame(
   Test = RecentTestFrame$Published.Test, 
-  Folder = read.xslx(TAB.wb)$Local.folder[match(RecentTestFrame$Published.Test,read.xslx(TAB.wb)$TestName)])
+  Folder = read.xlsx(TAB.wb)$Local.folder[match(RecentTestFrame$Published.Test,read.xlsx(TAB.wb)$TestName)])
 if(nrow(NewScannedTests) > 0){
   NewScannedTests$MakeReport = F
   NewScannedTests$SendReport = T
@@ -92,8 +92,8 @@ if(nrow(NewScannedTests) > 0){
 
 AllScannedTests = rbind(NewScannedTests, ScannedTests)
 UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
-for(i in 1:nrow(UniqueScannedTests)){
-  for(j in c("SendReport","Update","Monitor")){
+for(i in 1:nrow(UniqueScannedTests)){ # For each unique scanned test
+  for(j in c("MakeReport","SendReport","Update","Monitor")){ # check whether any instance of it (or or new) requires certain actions
     UniqueScannedTests[i,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
   }
 }
