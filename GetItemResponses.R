@@ -11,6 +11,7 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
   Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
   Sections$Level[is.na(Sections$Level)] = ""
   CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
+  TAB = read.xlsx(TAB.wb)
   
   # Check for testcodes missing from the TAB
   testnames = as.character(RecentTestFrame$Published.Test)
