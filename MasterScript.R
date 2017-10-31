@@ -39,9 +39,8 @@ RecentTestFrame = FindRecentTests(RecentEventFrame)
 TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
 TestFrame = FindTests(TestFolderFrame)
 
-# Check for tests not included in the tab
-missingTests = RecentTestFrame$Published.Test[!(RecentTestFrame$Published.Test %in% read.xlsx(TAB.wb)$TestName)]
-print(missingTests)
+# Check for tests not included in the tab, or that have altered testID's
+missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame)
 
 # If there are any missing tests, add them to the TAB and reload it
 UpdateTab(missingTests, TestFrame, TAB.wb, TABpath)
