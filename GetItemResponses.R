@@ -34,7 +34,7 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
 
     # Determine the class names and download the item response CSV's
     classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
-    GetAndStoreItemResponses_1test(currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
+    GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
     
   } # /for each reportable test
 } # /GetAndStoreItemResponses
