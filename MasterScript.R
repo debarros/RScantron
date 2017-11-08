@@ -17,6 +17,9 @@ source("credentials.R")
 # log in to scantron
 ScantronHandle = login(username, password, SiteCode, caLocation)
 
+# If you get an ssl certificate error, run the next line
+# ScantronHandle = login(username = username, password = password, SiteCode = SiteCode, caLocation = caLocation, ssl.verifypeer = FALSE)
+
 # Sign in to google
 gs_auth() # this might launch a browser so you can sign into your account
 ScannedTests.url = gs_url(ScannedTests.url.text) #enter the URL of the scanned test document here
