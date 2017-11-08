@@ -8,6 +8,7 @@
 #  SiteCode - character, the site code for the scantron account
 #  caLocation - character, file path and name for the certification file
 #  getNewCert - logical, whether a new certification file should be downloaded
+#  ssl.verifypeer - logical, whether curl should verify the identity of the server
 #
 # Returned value is:
 #  ScantronHandle - object of class CURLHandle, holding information about the session with the server
@@ -15,8 +16,9 @@
 login = function(username = character(), 
                  password = character(), 
                  SiteCode = character(), 
-                 caLocation = character(),
-                 getNewCert = F){
+                 caLocation = "cacert.pem",
+                 getNewCert = F, 
+                 ssl.verifypeer = TRUE){
   
   #Get set up ####
   
@@ -49,7 +51,8 @@ login = function(username = character(),
     useragent = agent,
     followlocation = TRUE,
     verbose = FALSE,
-    cookiejar = ""  
+    cookiejar = "",
+    ssl.verifypeer = ssl.verifypeer
   )
   ScantronHandle = getCurlHandle()
   curlSetOpt(.opts = Options, curl = ScantronHandle)  
