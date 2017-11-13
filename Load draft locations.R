@@ -1,30 +1,31 @@
 
+
+
 # These functions already existed
-DraftFolderFrame = FindFolders(ScantronHandle, "d", SkipDraftFolder) # Get all draft folders, including the entire text of the page
-DraftFrame = FindDrafts(DraftFolderFrame) # Find all draft tests mentioned on those folders
+# Do we want to run this stuff outside and pass in DraftFrame as an argument?
+DraftFolderFrame = FindFolders(ScantronHandle, "d", SkipDraftFolder)  # Get all draft folders, including the entire text of the page
+DraftFrame = FindDrafts(DraftFolderFrame)                             # Find all draft tests mentioned on those folders
 DraftFrame$Path = paste0(DraftFrame$folder, "/", DraftFrame$TestName) # Construct the full path to the draft
 
 
 # This function takes a curl handle and a published test id and returns the name of the draft on which the published test is based
 GetDraftName = function(ScantronHandle, tid){
-  url = paste0("https://admin.achievementseries.com/published-test/info.ssp?id=", tid)
-  TestPage = getURI(url = url, curl=ScantronHandle)
-  DraftNameStart = gregexpr(pattern = "Test Draft Name", text = TestPage)[[1]][1] + 82
-  SpanLocations = c(gregexpr(pattern = "</span>", text = TestPage)[[1]])
-  DraftNameEnd = min(SpanLocations[SpanLocations > DraftNameStart]) - 1
-  DraftName = substr(x = TestPage, start = DraftNameStart, stop = DraftNameEnd)
-  DraftName = gsub("&gt;", ">", DraftName)
-  DraftName = gsub("&amp;", "&", DraftName) #switch from html code for & to just the symbol
+  url = paste0("https://admin.achievementseries.com/published-test/info.ssp?id=", tid) # build the url
+  TestPage = getURI(url = url, curl=ScantronHandle)                                    # fetch the page
+  DraftNameStart = gregexpr("Test Draft Name", TestPage)[[1]][1] + 82                  # find where the draft name starts
+  SpanLocations = c(gregexpr("</span>", TestPage)[[1]])                                # find all instances of <\span>
+  DraftNameEnd = min(SpanLocations[SpanLocations > DraftNameStart]) - 1                # find where the draft name ends
+  DraftName = substr(TestPage, DraftNameStart, DraftNameEnd)                           # get the draft name
+  DraftName = FixHtmlChars(DraftName)                                                  # clean the draft name
   return(DraftName)
 }
 
 
 
-TAB = read.xlsx(TAB.wb) # Get the main sheet of the tab
-TAB.limited = TAB[TAB$TestName %in% TestFrame$TestName,] # limit it to just those tests that are in Scantron
+TAB = read.xlsx(TAB.wb)                                       # Get the main sheet of the tab
+TAB.limited = TAB[TAB$TestName %in% TestFrame$TestName,]      # limit it to just those tests that are in Scantron
 TAB.limited = TAB.limited[!duplicated(TAB.limited$TestName),] # remove any duplicates
-
-TAB.limited$DraftName = NA_character_ # Add a variable to hold the draft name
+TAB.limited$DraftName = NA_character_                         # Add a variable to hold the draft name
 
 # Go through the published tests that appear in both the TAB and in Scantron and get each Draft name
 for(i in 1:nrow(TAB.limited)){
