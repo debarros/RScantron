@@ -72,7 +72,7 @@ FindDrafts_1Folder = function (DraftFolderRow){
       }
       TempTests[,2] = DraftFolderRow$fname[1]    
       
-      TempTests$TestName = gsub("&gt;", ">", TempTests$TestName)
+      TempTests$TestName = FixHtmlChars(TempTests$TestName) # fix weird html characters
       
       return(TempTests)
     }
