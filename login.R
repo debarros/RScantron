@@ -22,6 +22,7 @@ login = function(username = character(),
                  messageLevel = 0){
   
   #Get set up ####
+  if(messageLevel > 0){print("Starting login function")}
   
   #set the address for the achievement series login page
   loginurl1 = "https://admin.achievementseries.com/Auth/Login/Org"  
@@ -46,6 +47,7 @@ login = function(username = character(),
   # Set the "agent" (the info that tells web servers what browsers we are using)
   agent="Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36" 
   
+  if(messageLevel > 0){print("Setting Rcurl parameters")}
   # Set RCurl parameters
   Options <- curlOptions(
     cainfo = caLocation, 
@@ -62,12 +64,14 @@ login = function(username = character(),
   
   # Login step 0 ####
   # Load the login page
+  if(messageLevel > 0){print("Loading the login page")}
   x = getURI(url = loginurl1, curl = ScantronHandle)
   
   
   
   # Login step 1 ####
   # Enter the siteID
+  if(messageLevel > 0){print("Login step 1")}
   Token = getToken(x)
   pars=list("SiteID" = SiteCode,
             "returnUrl" = "/Auth/Login/User",
@@ -78,6 +82,7 @@ login = function(username = character(),
   
   # Login step 2 #### 
   # enter the username and password
+  if(messageLevel > 0){print("Login step 2")}
   OrgID = getOrgID(x)
   pars=list(
     "Username" = username,
@@ -89,5 +94,6 @@ login = function(username = character(),
   x=postForm(uri = loginurl2, .params = pars, curl=ScantronHandle, .checkParams = FALSE)
   
   # Return ####
+  if(messageLevel > 0){print("Finishing login function")}
   return(ScantronHandle)
 }
