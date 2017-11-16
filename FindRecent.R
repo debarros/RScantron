@@ -33,10 +33,10 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
   } else {
     stop("You must specify at least one of RecentDays, url.ws, or TABpath")
   }
-}
+} # /FindRecentEvents function
 
 
-FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, status){
+FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, status, messageLevel = 0){
   IDcolumns = colnames(EventFrame)
   if(!newScores){
     IDcolumns = IDcolumns[!(IDcolumns %in% c("Score"))]
@@ -46,13 +46,13 @@ FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, stat
   RecentEventFrame = EventFrame[!(EventFrame$identifier %in% PriorEventFrame$identifier),1:(ncol(EventFrame)-1)]
   RecentEventFrame = RecentEventFrame[RecentEventFrame$Status %in% status, ]
   return(RecentEventFrame) 
-}
+} # /FindRecentEvents.compare function
 
 
 
 
 #FindRecentTests function
-FindRecentTests = function(RecentEventFrame){
+FindRecentTests = function(RecentEventFrame, messageLevel = 0){
   if(nrow(RecentEventFrame) == 0){
     print("There are no recent tests.")
     return(NULL)
@@ -67,4 +67,4 @@ FindRecentTests = function(RecentEventFrame){
   }
   RecentTestFrame = RecentTestFrame[order(-RecentTestFrame$Count), ]
   return(RecentTestFrame)
-}
+} # /FindRecentTests function
