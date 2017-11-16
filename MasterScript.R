@@ -15,10 +15,10 @@ source("credentials.R")
 #--------------#
 
 # log in to scantron
-ScantronHandle = login(username, password, SiteCode, caLocation)
+ScantronHandle = login(username, password, SiteCode, caLocation, messageLevel = 1)
 
 # If you get an ssl certificate error, run the next line
-# ScantronHandle = login(username = username, password = password, SiteCode = SiteCode, caLocation = caLocation, ssl.verifypeer = FALSE)
+# ScantronHandle = login(username = username, password = password, SiteCode = SiteCode, caLocation = caLocation, ssl.verifypeer = FALSE, messageLevel = 1)
 
 # Sign in to google
 gs_auth() # this might launch a browser so you can sign into your account
@@ -28,33 +28,33 @@ ScannedTests.url = gs_url(ScannedTests.url.text) #enter the URL of the scanned t
 #### Determine current reporting needs ####
 #-----------------------------------------#
 
-StudentFrame = FindStudents(ScantronHandle) # Get the complete list of students
-EventFrame = FindEvents(StudentFrame, ScantronHandle, schoolYear()) # Get the complete list of instances in which a student has taken a test
+StudentFrame = FindStudents(ScantronHandle, messageLevel = 1) # Get the complete list of students
+EventFrame = FindEvents(StudentFrame, ScantronHandle, schoolYear(), messageLevel = 1) # Get the complete list of instances in which a student has taken a test
 
 # Compare new event frame to old event frame and subset to the recent events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F)
+RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)
 # RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, RecentDays = 5, status = "Finished", updatePriorEvents = F)
 
 #Get a list of the recently scanned tests, and how many instances per test
-RecentTestFrame = FindRecentTests(RecentEventFrame)
+RecentTestFrame = FindRecentTests(RecentEventFrame, messageLevel = 1)
 
 # Get the complete list of tests with their test ID's and containing folders
-TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder)
-TestFrame = FindTests(TestFolderFrame)
+TestFolderFrame = FindFolders(ScantronHandle, "t", SkipTestFolder, messageLevel = 1)
+TestFrame = FindTests(TestFolderFrame, messageLevel = 1)
 
 # Check for tests not included in the tab, or that have altered testID's
-missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame)
+missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame, messageLevel = 1)
 
 # If there are any missing tests, add them to the TAB and reload it
 UpdateTab(missingTests, TestFrame, TAB.wb, TABpath)
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
-GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle)
+GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle, messageLevel = 1)
 # GetAndStoreItemResponses_SingleTest(testname = "Bio (2017-10-12) Pop Eco Human Impact Unit", TAB.wb)
 
 # Log out of scantron
-LogoutPage = logout(ScantronHandle)
+LogoutPage = logout(ScantronHandle, messageLevel = 1)
 
 # Generate the reports
 
