@@ -1,6 +1,6 @@
 #FindResults.R
 
-FindResults_1test = function(tid, ScantronHandle, attempt = 1){
+FindResults_1test = function(tid, ScantronHandle, attempt = 1, messageLevel = 0){
   scores = getURI(
     paste0(
       'https://admin.achievementseries.com/published-test/export/csv-list.csv?',

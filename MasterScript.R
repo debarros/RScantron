@@ -65,7 +65,7 @@ for(i in 1:nrow(RecentTestFrame)){
 }
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = TAB$Local.folder[TAB$TestName == "Ge (2017-10-06) Pts Lines Segments Angles +"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ea (2017-10-20) Coordinates Contours and Gradients"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 

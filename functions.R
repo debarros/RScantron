@@ -43,5 +43,4 @@ TABpath = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx"
 TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "TeacherLookup")
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
-TAB.wb = loadWorkbook(xlsxFile = TABpath) # Read in the TAB (Test Address Book)
-
+TAB.wb = loadWorkbook(xlsxFile = TABpath)      # Read in the TAB (Test Address Book)

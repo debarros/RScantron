@@ -4,7 +4,7 @@
 #It finds and return the post form value "__RequestVerificationToken"
 #This is necessary (I think) for maintaining a consistent identity during the login process
 
-getToken = function(x){
+getToken = function(x, messageLevel = 0){
   TokenInputStart = regexpr(pattern = "__RequestVerificationToken", text = x)[1] #Find where the input tag starts
   ValueLocations = gregexpr(pattern = 'value=', text = x)[[1]]                   #Find where the "value"s are
   TokenStart = ValueLocations[ValueLocations > TokenInputStart][1] + 7           #Find the end of the first "value" after the start of the tag

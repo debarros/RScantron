@@ -1,7 +1,7 @@
 #FindRecentEvents function
 
 FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = NULL, newScores = T, 
-                            status = c("Finished"), startcell = "A1", updatePriorEvents = T){
+                            status = c("Finished"), startcell = "A1", updatePriorEvents = T, messageLevel = 0){
   
   if(!is.null(RecentDays)){
     RecentEventFrame = EventFrame[which(EventFrame$Date >= Sys.Date()-(RecentDays - 1)),]

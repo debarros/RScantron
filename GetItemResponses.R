@@ -1,6 +1,6 @@
 #Get Item Responses
 
-GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle){
+GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle, messageLevel = 0){
   Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
   Coursecode2Course =  set_colnames(
     x = as.data.frame(

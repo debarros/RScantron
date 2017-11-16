@@ -1,6 +1,6 @@
 #FindClasses.R
 
-FindClasses = function(ScantronHandle){
+FindClasses = function(ScantronHandle, messageLevel = 0){
   
   #Set the URL's to be used
   url1 = "https://admin.achievementseries.com/classes/list.ssp"                #set the url for the class list page

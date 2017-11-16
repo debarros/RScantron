@@ -1,6 +1,6 @@
 #FindTests_1Folder.R
 
-FindTests_1Folder = function (TestFolderRow){
+FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
   
   #The only argument to this function is TestFolderRow, a 1-row data frame with three columns: 
   #   fname is the name of the current folder.  

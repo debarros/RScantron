@@ -4,7 +4,7 @@
 # If the caLocation exists, it uses that location
 # Otherwise, it sets the folder path and file name to the default
 
-ObtainNewCert = function(caLocation){
+ObtainNewCert = function(caLocation, messageLevel = 0){
   if(length(caLocation) == 0){
     caLocation = "cacert.pem.crt"
   } 

@@ -1,4 +1,6 @@
-FindStudents = function (ScantronHandle){
+# FindStudents.R
+
+FindStudents = function (ScantronHandle, messageLevel = 0){
   x = getURI('https://admin.achievementseries.com/students/list.ssp',curl=ScantronHandle)
   page = htmlParse(x)
   links = xpathSApply(page, "//a/@href")               # this finds all of the links in the document
@@ -84,4 +86,4 @@ FindStudents = function (ScantronHandle){
   
   return(bounds)
   
-}
+} # /function

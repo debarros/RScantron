@@ -18,7 +18,8 @@ login = function(username = character(),
                  SiteCode = character(), 
                  caLocation = "cacert.pem",
                  getNewCert = F, 
-                 ssl.verifypeer = TRUE){
+                 ssl.verifypeer = TRUE,
+                 messageLevel = 0){
   
   #Get set up ####
   

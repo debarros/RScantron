@@ -1,5 +1,5 @@
 #StoreDrafts.R
-StoreDrafts = function(DraftFrame, MaxDrafts = NA_integer_){
+StoreDrafts = function(DraftFrame, MaxDrafts = NA_integer_, messageLevel = 0){
   urlStub = "https://admin.achievementseries.com/test-draft/content/list.ssp?id="
   DraftFrame$page = ""
   if(is.na(MaxDrafts)){

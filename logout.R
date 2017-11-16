@@ -3,7 +3,7 @@
 # The only argument it takes is ScantronHandle
 # It returns the content of the logout page
 
-logout = function(ScantronHandle){
+logout = function(ScantronHandle, messageLevel = 0){
   #First, get the home page
   x = getURI(url = 'https://admin.achievementseries.com/home/home.ssp', 
              curl = ScantronHandle)
