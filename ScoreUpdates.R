@@ -1,6 +1,6 @@
 #Score Updates
 
-ScoreUpdates = function(RecentEventFrame,RecentTestFrame,cap){
+ScoreUpdates = function(RecentEventFrame, RecentTestFrame, cap, messageLevel = 0){
   #cap is the maximum number of scan events a test can have and still be an update
   
   x = RecentEventFrame

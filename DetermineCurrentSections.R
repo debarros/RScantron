@@ -1,6 +1,9 @@
 #DetermineCurrentSections.R
 
-DetermineCurrentSections = function(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course){
+DetermineCurrentSections = function(testname, CustomSectioning, 
+                                    Sections, testcode, 
+                                    Coursecode2Testcode, Coursecode2Course, 
+                                    messageLevel = 0){
   
   # Determine the sections for this test code
   if(testname %in% CustomSectioning$TestTitle){ # if there are custom sections, just get those

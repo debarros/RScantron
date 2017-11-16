@@ -9,7 +9,7 @@ DraftFrame$Path = paste0(DraftFrame$folder, "/", DraftFrame$TestName) # Construc
 
 
 # This function takes a curl handle and a published test id and returns the name of the draft on which the published test is based
-GetDraftName = function(ScantronHandle, tid){
+GetDraftName = function(ScantronHandle, tid, messageLevel = 0){
   urlstub = "https://admin.achievementseries.com/published-test/info.ssp?id=" # url stub for getting published test pages
   url = paste0(urlstub, tid)                                                  # build the url for the current test
   TestPage = getURI(url = url, curl=ScantronHandle)                           # fetch the page
