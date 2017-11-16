@@ -31,7 +31,7 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
     
     
     currentSections = DetermineCurrentSections(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course)
-
+    
     # Determine the class names and download the item response CSV's
     classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
     GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
@@ -41,7 +41,7 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
 
 
 
-GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, ScantronHandle){
+GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, ScantronHandle, messageLevel = 0){
   for(j in 1:length(classIDs)){
     currentClassID = classIDs[j] # get the ClassID for the section
     currentClassName = classnames[j]
@@ -56,7 +56,7 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
 
 
 
-GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb){
+GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 0){
   Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
   Coursecode2Course =  set_colnames(
     x = as.data.frame(
@@ -78,7 +78,7 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb){
 
 
 
-GetItemResponses_1section = function(ClassID, TestID, curlhandle){
+GetItemResponses_1section = function(ClassID, TestID, curlhandle, messageLevel = 0){
   responses = getURI(
     paste0(
       "https://admin.achievementseries.com/report/class/responses.csv?",
