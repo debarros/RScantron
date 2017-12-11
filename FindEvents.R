@@ -3,9 +3,11 @@
 FindEvents = function (StudentFrame, ScantronHandle, SchoolYear = NULL, messageLevel = 0){
   EventFrame = data.frame(character(),character(),character(),character(),stringsAsFactors = FALSE)
   for (i in 1:nrow(StudentFrame)){
-    print(paste0("Student ",i," of ",nrow(StudentFrame)))
+    
+    if(messageLevel > 0 ){ print(paste0("Student ",i," of ",nrow(StudentFrame))) }
+    
     sid = StudentFrame$sid[i]
-    x = FindEvents_1Student(sid,ScantronHandle)
+    x = FindEvents_1Student(sid = sid, ScantronHandle = ScantronHandle, messageLevel = messageLevel - 1)
     x = x[,-c(2,5,7)] #remove unnecessary columns
     if(nrow(x)>0){
       StNameRep = rep(StudentFrame$StName[i],nrow(x))
