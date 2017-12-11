@@ -37,6 +37,7 @@ source("UpdateTab.R")
 source("DetermineCurrentSections.R")
 source("FindMissingTests.R")
 source("FixHtmlChars.R")
+source("BadReturnCheck.R")
 
 #Data
 TABpath = "\\\\stuthin2/Data/tests/2017-2018/TAB.xlsx"
