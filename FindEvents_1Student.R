@@ -16,7 +16,7 @@ FindEvents_1Student = function(sid, ScantronHandle, attempt = 1, messageLevel = 
   #Recursive call: If the http request got an error page, redo the request
   if(ncol(q) != 7){
     if(messageLevel > 0){ print("e1") }
-    q = FindEvents_1Student(sid, ScantronHandle, attempt = attempt+1)
+    q = FindEvents_1Student(sid = sid, ScantronHandle = ScantronHandle, attempt = attempt + 1, messageLevel = messageLevel)
     if(messageLevel > 0){ print("e2") }
   }
   
