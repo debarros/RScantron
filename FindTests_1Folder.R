@@ -1,19 +1,16 @@
 #FindTests_1Folder.R
 
+# Note: this appears to have an unneccesary conditional.  The existence of test links is checked twice.
+
 FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
   
-  #The only argument to this function is TestFolderRow, a 1-row data frame with three columns: 
+  # The only argument to this function is TestFolderRow, a 1-row data frame with three columns: 
   #   fname is the name of the current folder.  
   #   fid is the folder id.
   #   page is the actual page displaying the folder
   
-  #This function will return a data.frame listing the names, id's, and containing folder name of every test in this folder
+  # This function will return a data.frame listing the names, id's, and containing folder name of every test in this folder
   #   (obviously, the containing folder will be the same for every test in one call of this function)
-  
-  library(reshape2)
-  library(stringr)
-  library(XML)
-  library(RCurl)
   
   #Initialize the TempTests data.frame.  This will hold the list of the names of the tests, along with their folders and id's.
   TempTests = data.frame(character(),character(),character(),stringsAsFactors = FALSE)  
@@ -29,8 +26,9 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
   TestLinks = substr(links[grep("info.ssp\\?id=",links)],29,44)    
   
   if(length(TestLinks) == 0){    #if there are no tests in this foler, 
+    if(messageLevel > 0){ print(paste0(TestFolderRow$fname, " has no tests."))}
     return(TempTests)            # return the empty data.frame
-  }else{  
+  } else {  
     
     
     # The object "Location" holds the starting points of the test ID codes, which are all of the same length
@@ -40,9 +38,9 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
         gregexpr(pattern = TestLinks[i],TestFolderRow[1,3])[[1]][1])
     }
     
-    if(nrow(Location)==0){                   # If there are no tests here,
-      return(TempTests)                             # return the empty data.frame
-    }else{                                        # If there are tests, continue to find them
+    if(nrow(Location)==0){    # If there are no tests here,
+      return(TempTests)       # return the empty data.frame
+    } else {                  # If there are tests, continue to find them
       
       
       #Append to the Location data.frame the starting position of each test name
@@ -75,6 +73,6 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
       TempTests$TestName = FixHtmlChars(TempTests$TestName) # fix special characters
       
       return(TempTests)
-    }
-  }
-}
+    } # /if-else there are no tests in the folder
+  } # /if-else there are no tests in the folder
+} # /function
