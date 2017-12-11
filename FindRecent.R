@@ -28,7 +28,7 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
       writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 # store the complete events
       saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
     }
-    return(FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status))
+    return(FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status, messageLevel = messageLevel - 1))
     
   } else {
     stop("You must specify at least one of RecentDays, url.ws, or TABpath")
