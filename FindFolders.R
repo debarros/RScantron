@@ -27,14 +27,17 @@ FindFolders = function(ScantronHandle, type,
   
   z = c(31,46)  #these help find the fid in the links
   
-  if (type == "t"){url = 'https://admin.achievementseries.com/published-tests/list.ssp'}
-  if (type == "s"){url = 'https://admin.achievementseries.com/scheduled-tests/list.ssp'}  
-  if (type == "d"){url = 'https://admin.achievementseries.com/test-drafts/list.ssp'
+  if(type == "t"){url = 'https://admin.achievementseries.com/published-tests/list.ssp'}
+  if(type == "s"){url = 'https://admin.achievementseries.com/scheduled-tests/list.ssp'}  
+  if(type == "d"){url = 'https://admin.achievementseries.com/test-drafts/list.ssp'
   z = z - 4 #the links in the test drafts folders are 4 characters shorter
   }
   
   #If this is the first call of the function, get the page for the top level folder
-  if (length(x)==0){ x = getURI(url, curl=ScantronHandle) }
+  if(length(x) == 0){ 
+    if(messageLevel > 0){ print("Retrieving the page for the top level folder.")}
+    x = getURI(url, curl=ScantronHandle) 
+  } #/if
   
   # this will hold the folder names and id's
   TempFolders = data.frame(parent, ThisFolderID, x, stringsAsFactors = FALSE)  
@@ -59,7 +62,7 @@ FindFolders = function(ScantronHandle, type,
     location = data.frame(location[-drop,])                # get rid of them
   }
   
-  if(nrow(location)==0){ return(TempFolders) }             # If there are no folders here, return the empty data.frame
+  if(nrow(location) == 0){ return(TempFolders) }             # If there are no folders here, return the empty data.frame
   
   # The object "bounds" will hold the starting and ending position of the name of each subfolder
   # First, find the starting position of every folder name, using the link text
@@ -113,7 +116,7 @@ FindFolders = function(ScantronHandle, type,
   }
   
   # If the only subfolders in the current folder are in SkipFolder, bounds will be empty now
-  if(nrow(bounds)==0){ return(TempFolders) }  # If there are no folders remaining in the list, return the empty data.frame
+  if(nrow(bounds) == 0){ return(TempFolders) }  # If there are no folders remaining in the list, return the empty data.frame
   
   
   ############ Section 3: Recursive Call ##########
@@ -130,6 +133,9 @@ FindFolders = function(ScantronHandle, type,
     NextFolderID = bounds$fid[i]                  # pick one at a time
     address = paste0(url,'?fid=',NextFolderID,
                      '&ft=O&et=P&_p=1')
+    if(messageLevel > 0){ 
+      print("Retrieving the page for the next folder.")
+    } # /if    
     x = getURI(address, curl=ScantronHandle)      # get the folder page
     TempParent = bounds$fname[i]                  # get the name of the folder page
     FolderGrab = FindFolders(ScantronHandle, type,# recursive call
@@ -138,9 +144,8 @@ FindFolders = function(ScantronHandle, type,
                              NextFolderID)        
     if(nrow(FolderGrab)>0){                       # if any subfolders were returned from the folder just examined,
       SubFolders = rbind(SubFolders, FolderGrab)  # append them to the subfolders data.frame
-    }
-    
-  }
+    } # /if
+  } # /for each subfolder
   
   
   ############ Section 4: Wrap Up ##########
