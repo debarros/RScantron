@@ -1,6 +1,9 @@
 # FindMissingTests.R
 
 FindMissingTests = function(RecentTestFrame, TAB.wb, TestFrame, messageLevel = 0){
+  
+  if(messageLevel > 0){ print("Finding missing tests.")}
+  
   TAB = read.xlsx(TAB.wb)
   
   # Check for tests not included in the tab
