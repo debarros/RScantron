@@ -22,7 +22,9 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
   }
   
   for(i in 1:nrow(RecentTestFrame)){
-    print(paste0("row ",i," of ",nrow(RecentTestFrame)))
+    
+    if(messageLevel > 0){ print(paste0("row ",i," of ",nrow(RecentTestFrame))) }
+    
     # Get the current test name, code, and id
     testname = as.character(RecentTestFrame$Published.Test[i])
     testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
@@ -34,7 +36,9 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
     
     # Determine the class names and download the item response CSV's
     classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
-    GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, classnames, testid, testpath, ScantronHandle)
+    GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, 
+                                   classnames, testid, testpath, ScantronHandle, 
+                                   messageLevel = messageLevel - 1)
     
   } # /for each reportable test
 } # /GetAndStoreItemResponses
@@ -43,11 +47,16 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, Scantron
 
 GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, ScantronHandle, messageLevel = 0){
   for(j in 1:length(classIDs)){
-    currentClassID = classIDs[j] # get the ClassID for the section
-    currentClassName = classnames[j]
+    currentClassID = classIDs[j]     # get the ClassID for the section
+    currentClassName = classnames[j] # get the name for the section
     
     # download the item response file
     currentresponses = GetItemResponses_1section(ClassID = currentClassID, TestID = testid, curlhandle = ScantronHandle)
+    
+    # Check to make sure it worked
+    if(BadReturnCheck(currentresponses)){
+      stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+    }
     
     # store it in the exports folder
     StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
@@ -67,6 +76,7 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 
   Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
   Sections$Level[is.na(Sections$Level)] = ""
   CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
+  TAB = read.xlsx(TAB.wb)
   
   testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
   testid = TAB$TestID[TAB$TestName == testname][1]
