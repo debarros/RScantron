@@ -46,21 +46,21 @@ TestFrame = FindTests(TestFolderFrame, messageLevel = 1)
 missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame, messageLevel = 1)
 
 # If there are any missing tests, add them to the TAB and reload it
-UpdateTab(missingTests, TestFrame, TAB.wb, TABpath)
+UpdateTab(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 1)
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, ScantronHandle, messageLevel = 1)
-# GetAndStoreItemResponses_SingleTest(testname = "Bio (2017-10-12) Pop Eco Human Impact Unit", TAB.wb)
+# GetAndStoreItemResponses_SingleTest(testname = "H3 (2017-12-01) Civil War and Poetry", TAB.wb, messageLevel = 2)
 
 # Log out of scantron
 LogoutPage = logout(ScantronHandle, messageLevel = 1)
 
 # Generate the reports
-
-for(i in 1:nrow(RecentTestFrame)){
-  print(i)
-  DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == RecentTestFrame$Published.Test[i]]
+testsToUse = as.character(RecentTestFrame$Published.Test)
+for(i in 1:length(testsToUse)){
+  print(paste0(i, " of ", length(testsToUse), " - ", testsToUse[i]))
+  DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == testsToUse[i]]
   generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 }
 
@@ -91,6 +91,13 @@ if(nrow(NewScannedTests) > 0){
   NewScannedTests$Monitor = T
 }
 
+# If ScannedTests has extra columns, put them in NewScannedTests also
+if(ncol(ScannedTests) > 6){
+  moreColumns = colnames(ScannedTests)[7:ncol(ScannedTests)]
+  for(curColumn in moreColumns){
+    NewScannedTests[,curColumn] = ""  
+  } # /for each extra column
+} # /if there are extra columns
 
 AllScannedTests = rbind(NewScannedTests, ScannedTests)
 UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
@@ -110,4 +117,4 @@ gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor 
 gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
 
 # update prior events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T)
+RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
