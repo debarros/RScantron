@@ -7,6 +7,12 @@ FindResults_1test = function(tid, ScantronHandle, attempt = 1, messageLevel = 0)
       'id=',tid,
       '&d=F&t=T&r=F&p=F&_list=ExportList'),
     curl=ScantronHandle)
+  
+  # Check to make sure it worked
+  if(BadReturnCheck(scores, messageLevel - 1)){
+    stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+  }
+  
   q = read.csv(textConnection(scores), stringsAsFactors = FALSE) #treat the page to a csv and make a data.frame
   
   #Recursive call: If the http request got an error page, redo the request
@@ -18,7 +24,7 @@ FindResults_1test = function(tid, ScantronHandle, attempt = 1, messageLevel = 0)
   print(paste0("q has ",ncol(q)," columns."))
   
   return(q)
-}
+} # /function
 
 
 
@@ -34,6 +40,6 @@ FindResults = function (testIDs, ScantronHandle){
   ResultFrame$TestAdministrationStartDate = as.Date(ResultFrame$TestAdministrationStartDate, "%m/%d/%y")
   ResultFrame$Score = ResultFrame$PointsAttained / ResultFrame$PointsPossible
   return(ResultFrame)
-}
+} # /function
 
 
