@@ -13,7 +13,8 @@
 # Returned value is:
 #  ScantronHandle - object of class CURLHandle, holding information about the session with the server
 
-login = function(username = character(), 
+login = function(loginurls,
+                 username = character(), 
                  password = character(), 
                  SiteCode = character(), 
                  caLocation = "cacert.pem",
@@ -25,8 +26,8 @@ login = function(username = character(),
   if(messageLevel > 0){print("Starting login function")}
   
   #set the address for the achievement series login page
-  loginurl1 = "https://admin.achievementseries.com/Auth/Login/Org"  
-  loginurl2 = "https://admin.achievementseries.com/Auth/?returnUrl=%2FAuth%2FLogin%2FUser"
+  loginurl1 = loginurls$step1
+  loginurl2 = loginurls$step2
   
   
   # If a new certification file is needed, download it
@@ -45,7 +46,7 @@ login = function(username = character(),
   if(length(password) == 0){password = readline(prompt="password: ")}
   
   # Set the "agent" (the info that tells web servers what browsers we are using)
-  agent="Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36" 
+  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36" 
   
   if(messageLevel > 0){print("Setting Rcurl parameters")}
   # Set RCurl parameters

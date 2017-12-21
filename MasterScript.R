@@ -15,10 +15,10 @@ source("credentials.R")
 #--------------#
 
 # log in to scantron
-ScantronHandle = login(username, password, SiteCode, caLocation, messageLevel = 1)
+ScantronHandle = login(loginurls, username, password, SiteCode, caLocation, messageLevel = 1)
 
 # If you get an ssl certificate error, run the next line
-# ScantronHandle = login(username = username, password = password, SiteCode = SiteCode, caLocation = caLocation, ssl.verifypeer = FALSE, messageLevel = 1)
+# ScantronHandle = login(loginurls, username, password, SiteCode, caLocation, ssl.verifypeer = FALSE, messageLevel = 1)
 
 # Sign in to google
 gs_auth() # this might launch a browser so you can sign into your account
