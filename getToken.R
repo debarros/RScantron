@@ -1,8 +1,8 @@
 #getToken.R
 
-#This function takes one argument, x.  It is the initial login page.
-#It finds and return the post form value "__RequestVerificationToken"
-#This is necessary (I think) for maintaining a consistent identity during the login process
+# This function takes one argument, x.  It is the initial login page.
+# It finds and return the post form value "__RequestVerificationToken"
+# This is necessary (I think) for maintaining a consistent identity during the login process
 
 getToken = function(x, messageLevel = 0){
   TokenInputStart = regexpr(pattern = "__RequestVerificationToken", text = x)[1] #Find where the input tag starts
@@ -11,4 +11,4 @@ getToken = function(x, messageLevel = 0){
   QuoteLocations = gregexpr(pattern = '\\"', text = x)[[1]]                      #Find where the quotation marks are
   TokenEnd = QuoteLocations[QuoteLocations > TokenStart][1]-1                    #Find the quote at the end of the token
   return(substr(x, TokenStart, TokenEnd))                                        #Return the token
-}#end of function
+} # /function
