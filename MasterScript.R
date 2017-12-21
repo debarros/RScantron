@@ -8,6 +8,7 @@
 gc() #garbage collection clears data no longer being used from memory
 source("functions.R") #load the functions
 source("credentials.R") 
+source("httrtest.R")
 
 
 #--------------#
@@ -15,10 +16,10 @@ source("credentials.R")
 #--------------#
 
 # log in to scantron
-ScantronHandle = login(loginurls, username, password, SiteCode, caLocation, messageLevel = 1)
+#ScantronHandle = login(loginurls, username, password, SiteCode, caLocation, messageLevel = 1)
 
 # If you get an ssl certificate error, run the next line
-# ScantronHandle = login(loginurls, username, password, SiteCode, caLocation, ssl.verifypeer = FALSE, messageLevel = 1)
+ScantronHandle = hlogin(loginurls, username, password, SiteCode, caLocation, ssl.verifypeer = FALSE, messageLevel = 1)
 
 # Sign in to google
 gs_auth() # this might launch a browser so you can sign into your account
