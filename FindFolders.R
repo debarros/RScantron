@@ -39,6 +39,11 @@ FindFolders = function(ScantronHandle, type,
     x = getURI(url, curl=ScantronHandle) 
   } #/if
   
+  # Check to make sure it worked
+  if(BadReturnCheck(x, messageLevel - 1)){
+    stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+  }
+  
   # this will hold the folder names and id's
   TempFolders = data.frame(parent, ThisFolderID, x, stringsAsFactors = FALSE)  
   colnames(TempFolders) = c("fname", "fid","page")
@@ -137,6 +142,12 @@ FindFolders = function(ScantronHandle, type,
       print("Retrieving the page for the next folder.")
     } # /if    
     x = getURI(address, curl=ScantronHandle)      # get the folder page
+    
+    # Check to make sure it worked
+    if(BadReturnCheck(x, messageLevel - 1)){
+      stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+    }
+    
     TempParent = bounds$fname[i]                  # get the name of the folder page
     FolderGrab = FindFolders(ScantronHandle, type,# recursive call
                              SkipFolder, x, 
