@@ -8,6 +8,12 @@ FindClasses = function(ScantronHandle, messageLevel = 0){
   
   #Pull the classes page in order to get the ClassID from the links
   x = getURI(url1, curl=ScantronHandle)                           #fetch the page with the list of classes
+  
+  # Check to make sure it worked
+  if(BadReturnCheck(x, messageLevel - 1)){
+    stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+  }
+  
   page = htmlParse(x)                                             #convert the page to a parsed html object
   links = xpathSApply(page, "//a/@href")                          #this finds all of the links in the document
   ClassLinks = substr(links[grep("info.ssp\\?id=",links)],20,35)  #this pulls out the ClassID's from the links
