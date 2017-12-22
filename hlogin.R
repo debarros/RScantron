@@ -20,12 +20,14 @@ hlogin = function(loginurls,
                   username = character(),
                   password = character(),
                   SiteCode = character(),
-                  messageLevel = 0) {
+                  messageLevel = 0,
+                  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                  ){
   #######
   # SETUP
   ### ###
   
-  if (messageLevel) {
+  if (messageLevel > 0) {
     print("Starting login process")
   }
   
@@ -44,10 +46,7 @@ hlogin = function(loginurls,
     password = rstudioapi::askForPassword(prompt = "password: ")
   }
   
-  # Set the "agent" (the info that tells web servers what browsers we are using)
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-  
-  if (messageLevel) {
+  if (messageLevel > 0) {
     print("Getting Login Page")
   }
   x <- httr::GET(url = loginurl1, user_agent(agent))
@@ -56,7 +55,7 @@ hlogin = function(loginurls,
   # STEP 1: ENTER SITE ID
   ### ###
   
-  if (messageLevel) {
+  if (messageLevel > 0) {
     print("Entering siteID")
   }
   Tok <- getToken(x)
@@ -76,7 +75,7 @@ hlogin = function(loginurls,
   # STEP 2: ENTER CREDENTIALS
   ### ###
   
-  if (messageLevel) {
+  if (messageLevel > 0) {
     print("Entering Username, PW")
   }
   OrgID = getOrgID(x)
@@ -93,7 +92,7 @@ hlogin = function(loginurls,
                body = pars,
                encode = "multipart")
   
-  if (messageLevel) {
+  if (messageLevel > 0) {
     print("Finishing login function")
   }
 }

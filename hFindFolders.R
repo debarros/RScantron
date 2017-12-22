@@ -1,18 +1,21 @@
 #This function is used to create a list of all of the Folders (Draft, Published, or Scheduled)
 
 hFindFolders = function(type = "t",
-                       SkipFolder = as.character('NA'),
-                       x = character(), 
-                       parent = as.character(''), 
-                       ThisFolderID = as.character('Root'), 
-                       messageLevel = 0){
+                        SkipFolder = as.character('NA'),
+                        x = character(), 
+                        parent = as.character(''), 
+                        ThisFolderID = as.character('Root'), 
+                        messageLevel = 0,
+                        agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                        ){
   
-  # This function takes 5 arguments: 
+  # This function takes 6 arguments: 
   #   type = t for published tests, d for drafts, and s for scheduled sessions
   #   SkipFolder = the name of folders that are not to be included (nor are their subfolders)
   #   x = the current page, or empty on first call
   #   parent = name of the folder we are in right now, or 'Root' if it is the top level folder
   #   ThisFolderID = fid of the folder we are in right now, or 'Root' if it is the top level folder
+  #   agent = the user agent string for browser spoofing
   
   
   #This function returns a data.frame called TempFolders.
@@ -25,8 +28,6 @@ hFindFolders = function(type = "t",
   ############ Section 1: Setup ##########
   
   z = c(31,46)  #these help find the fid in the links
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-  
   if(type == "t"){url = 'https://admin.achievementseries.com/published-tests/list.ssp'}
   if(type == "s"){url = 'https://admin.achievementseries.com/scheduled-tests/list.ssp'}  
   if(type == "d"){url = 'https://admin.achievementseries.com/test-drafts/list.ssp'
@@ -35,9 +36,12 @@ hFindFolders = function(type = "t",
   
   #If this is the first call of the function, get the page for the top level folder
   if(length(x) == 0){ 
-    if(messageLevel){ print("Retrieving the page for the top level folder.")}
-    x <- httr::GET(url = url, user_agent(agent))
-    x <- content(x, as = "text")
+    if(messageLevel > 0){ print("Retrieving the page for the top level folder.")}
+    x <- content(httr::GET(url = url,
+                           user_agent(agent)),
+                 as = "text",
+                 encoding = "UTF-8")
+    # x <- content(x, as = "text")
     #BadReturnCheck(x)
   } #/if
   
@@ -140,11 +144,14 @@ hFindFolders = function(type = "t",
     NextFolderID = bounds$fid[i]                  # pick one at a time
     address = paste0(url,'?fid=',NextFolderID,
                      '&ft=O&et=P&_p=1')
-    if(messageLevel){ 
+    if(messageLevel > 0){ 
       print("Retrieving the page for the next folder.")
     } # /if    
-    x <- httr::GET(url = address, user_agent(agent))
-    x <- content(x, as = "text")  # get the folder page
+    x <- content(httr::GET(url = address,
+                           user_agent(agent)),
+                 as = "text",
+                 encoding = "UTF-8")
+    # x <- content(x, as = "text")  # get the folder page
     
     # Check to make sure it worked
     if(BadReturnCheck(x, messageLevel - 1)){

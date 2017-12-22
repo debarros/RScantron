@@ -1,8 +1,14 @@
 #Get Item Responses
 
-hGetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 0){
-  
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+##########
+# GetAndStoreItemResponses
+### ## ###
+hGetAndStoreItemResponses = function(RecentTestFrame,
+                                     TestFrame,
+                                     TAB.wb,
+                                     messageLevel = 0,
+                                     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                                     ){
   
   Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
   Coursecode2Course =  set_colnames(
@@ -26,7 +32,7 @@ hGetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, message
   
   for(i in 1:nrow(RecentTestFrame)){
     
-    if(messageLevel){ print(paste0("row ",i," of ",nrow(RecentTestFrame))) }
+    if(messageLevel > 0){ print(paste0("row ",i," of ",nrow(RecentTestFrame))) }
     
     # Get the current test name, code, and id
     testname = as.character(RecentTestFrame$Published.Test[i])
@@ -40,21 +46,34 @@ hGetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, message
     # Determine the class names and download the item response CSV's
     classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
     hGetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, 
-                                   classnames, testid, testpath,
-                                   messageLevel = messageLevel - 1)
+                                   classnames,
+                                   testid,
+                                   testpath,
+                                   messageLevel = messageLevel - 1,
+                                   agent)
     
   } # /for each reportable test
 } # /GetAndStoreItemResponses
 
 
-
-hGetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, messageLevel = 0){
+##########
+# GetAndStoreItemResponses_1test
+### ## ###
+hGetAndStoreItemResponses_1test = function(classIDs,
+                                           classnames,
+                                           testid,
+                                           testpath,
+                                           messageLevel = 0,
+                                           agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                                           ){
   for(j in 1:length(classIDs)){
     currentClassID = classIDs[j]     # get the ClassID for the section
     currentClassName = classnames[j] # get the name for the section
     
     # download the item response file
-    currentresponses = hGetItemResponses_1section(ClassID = currentClassID, TestID = testid)
+    currentresponses = hGetItemResponses_1section(ClassID = currentClassID,
+                                                  TestID = testid,
+                                                  agent = agent)
     
     # Check to make sure it worked
     if(BadReturnCheck(currentresponses)){
@@ -62,13 +81,21 @@ hGetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpat
     }
     
     # store it in the exports folder
-    StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
+    StoreItemResponses(responses = currentresponses,
+                       testpath = testpath,
+                       classname = currentClassName)
   } # /for each section
 } # /GetAndStoreItemResponses_1test
 
 
-
-hGetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 0){
+##########
+# GetAndStoreItemResponses_SingleTest
+### ## ###
+hGetAndStoreItemResponses_SingleTest = function(testname,
+                                                TAB.wb,
+                                                messageLevel = 0,
+                                                agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                                                ){
   Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
   Coursecode2Course =  set_colnames(
     x = as.data.frame(
@@ -86,20 +113,30 @@ hGetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel =
   testpath = TAB$Local.folder[TAB$TestID == testid][1]
   currentSections = DetermineCurrentSections(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course)
   classnames = paste0(currentSections$TeacherName,"_p", currentSections$Period, currentSections$Level)
-  hGetAndStoreItemResponses_1test(currentSections$ClassID, classnames, testid, testpath)
+  hGetAndStoreItemResponses_1test(currentSections$ClassID,
+                                  classnames,
+                                  testid,
+                                  testpath,
+                                  agent)
 } # /GetAndStoreItemResponses_SingleTest
 
 
-
-hGetItemResponses_1section = function(ClassID, TestID, messageLevel = 0){
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-  x <- httr::GET(url = paste0(
-    "https://admin.achievementseries.com/report/class/responses.csv?",
-    "c=", ClassID, 
-    "&t=", TestID, 
-    "&v=table&_list=Students"),
-    user_agent(agent))
-  responses = content(x, as = "text")
+##########
+# GetItemResponses_1section
+### ## ###
+hGetItemResponses_1section = function(ClassID,
+                                      TestID,
+                                      messageLevel = 0,
+                                      agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                                      ){
+  responses <- content(httr::GET(url = paste0("https://admin.achievementseries.com/report/class/responses.csv?",
+                                              "c=", ClassID, 
+                                              "&t=", TestID, 
+                                              "&v=table&_list=Students"),
+                                 user_agent(agent)),
+                       as = "text",
+                       encoding = "UTF-8")
+  # responses = content(x, as = "text")
   responses = gsub(pattern = "\r\n", replacement = "\n",x = responses) # replace CRLF with LF to avoid blank lines
   return(responses)
 } # /GetItemResponses

@@ -1,13 +1,14 @@
-#FindEvents.R
+#hFindEventsFindEvents.R
 
-hFindEvents = function (StudentFrame, SchoolYear = NULL, messageLevel = 0){
-  
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-  
+hFindEvents = function (StudentFrame,
+                        SchoolYear = NULL,
+                        messageLevel = 0,
+                        agent= "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                        ){ 
   EventFrame = data.frame(character(),character(),character(),character(),stringsAsFactors = FALSE)
   for (i in 1:nrow(StudentFrame)){
     
-    if(messageLevel){ print(paste0("Student ",i," of ",nrow(StudentFrame))) }
+    if(messageLevel > 0){ print(paste0("Student ",i," of ",nrow(StudentFrame))) }
     
     sid = StudentFrame$sid[i]
     x = hFindEvents_1Student(sid = sid, messageLevel = messageLevel - 1)

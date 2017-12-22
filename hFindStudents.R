@@ -1,12 +1,14 @@
 # hFindStudents.R
 
-hFindStudents = function (messageLevel = 0){
-  
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-  
+hFindStudents = function (messageLevel = 0,
+                          agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+                          ){
   # Get the student list page
-  x <- httr::GET(url = 'https://admin.achievementseries.com/students/list.ssp', user_agent(agent))
-  x <- content(x, as = "text")
+  x <- content(httr::GET(url = 'https://admin.achievementseries.com/students/list.ssp',
+                         user_agent(agent)),
+               as = "text",
+               encoding = "UTF-8")
+  # x <- content(x, as = "text")
   
   # Check to make sure it worked
   if(BadReturnCheck(x, messageLevel - 1)){
