@@ -1,5 +1,4 @@
 #This function is used to create a list of all of the Folders (Draft, Published, or Scheduled)
-
 FindFolders = function(type = "t",
                        SkipFolder = as.character('NA'),
                        x = character(), 
@@ -56,6 +55,7 @@ FindFolders = function(type = "t",
       idmatches = regmatches(x = optionstring, m = idmatchlist)[[1]]       # Get the id and other crap
       idstring = idmatches[length(idmatches)]                              # Get just the id
       address = paste0(url, '?fid=', idstring, '&ft=O&et=P&_p=1')          # Make the address for the top level folder
+
       x <- content(httr::GET(url = address,
                              user_agent(agent)),
                    as = "text",
@@ -71,23 +71,23 @@ FindFolders = function(type = "t",
   
   ############ Section 2: Find all the subfolders ##########
   
-  page = htmlParse(x)                                      # this creates a neat looking html string
-  links = xpathSApply(page, "//a/@href")                   # this finds all of the links in the document
-  folderlinks = substr(links[grep("fid",links)],z[1],z[2]) # this creates a list of the folder ID codes
-  MinPosition = gregexpr(pattern = "selected",x)[[1]][1]   # the folder links before the word "selected" are irrelevant
+  page = htmlParse(x)                                       # this creates a neat looking html string
+  links = xpathSApply(page, "//a/@href")                    # this finds all of the links in the document
+  folderlinks = substr(links[grep("fid", links)],z[1],z[2]) # this creates a list of the folder ID codes
+  MinPosition = gregexpr(pattern = "selected", x)[[1]][1]   # the folder links before the word "selected" are irrelevant
   
   # The object "location" holds the starting points of the folder ID codes, which are all of the same length
   location = data.frame(integer(0))                        # initialize the location data.frame
   for (i in 1:length(folderlinks)){                        # fill up the location data.frame with starting points of the folder ID codes
     location[i,1] = as.integer(gregexpr(pattern = folderlinks[i],x)[[1]][1])
   }
-  drop = which(location[,1]<MinPosition)                   # find the indices of the locations of fid's that occur before the start of the folder list
+  drop = which(location[,1] < MinPosition)                 # find the indices of the locations of fid's that occur before the start of the folder list
   
   if (length(drop) > 0){                                   # if there are any extraneous fid's,
     location = data.frame(location[-drop,])                # get rid of them
   }
   
-  if(nrow(location) == 0){ return(TempFolders) }             # If there are no folders here, return the empty data.frame
+  if(nrow(location) == 0){ return(TempFolders) }           # If there are no folders here, return the empty data.frame
   
   # The object "bounds" will hold the starting and ending position of the name of each subfolder
   # First, find the starting position of every folder name, using the link text
