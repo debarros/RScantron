@@ -1,12 +1,12 @@
 #This function is used to create a list of all of the Folders (Draft, Published, or Scheduled)
 
-hFindFolders = function(type = "t",
-                        SkipFolder = as.character('NA'),
-                        x = character(), 
-                        parent = as.character(''), 
-                        ThisFolderID = as.character('Root'), 
-                        messageLevel = 0,
-                        agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+FindFolders = function(type = "t",
+                       SkipFolder = as.character('NA'),
+                       x = character(), 
+                       parent = as.character(''), 
+                       ThisFolderID = as.character('Root'), 
+                       messageLevel = 0,
+                       agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
                         ){
   
   # This function takes 6 arguments: 
@@ -16,8 +16,7 @@ hFindFolders = function(type = "t",
   #   parent = name of the folder we are in right now, or 'Root' if it is the top level folder
   #   ThisFolderID = fid of the folder we are in right now, or 'Root' if it is the top level folder
   #   agent = the user agent string for browser spoofing
-  
-  
+  #  
   #This function returns a data.frame called TempFolders.
   #Each row in TempFolders holds information about one folder
   #The 3 columns are:
@@ -41,18 +40,33 @@ hFindFolders = function(type = "t",
                            user_agent(agent)),
                  as = "text",
                  encoding = "UTF-8")
-    # x <- content(x, as = "text")
-    #BadReturnCheck(x)
-  } #/if
-  
-  # Check to make sure it worked
-  if(BadReturnCheck(x, messageLevel - 1)){
-    stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
-  }
+      
+    # Check to make sure it worked
+    if(BadReturnCheck(x, messageLevel - 1)){
+      stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+    }
+    
+    # Check to make sure it's the top level folder
+    # This section is necessary b/c the site will typically just return the page for the last folder viewed
+    # This code has not been tested for draft or scheduled session folders
+    if(type == "t"){
+      optionmatchlist = gregexpr(pattern = "<option.{100}", text = x)      # Find the locations of option tags
+      optionstring = regmatches(x = x, m = optionmatchlist)[[1]][3]        # Find the text of option tags and grab the 3rd one
+      idmatchlist = regexec(pattern = "fid=(.{16})", text = optionstring)  # Find the location of the id
+      idmatches = regmatches(x = optionstring, m = idmatchlist)[[1]]       # Get the id and other crap
+      idstring = idmatches[length(idmatches)]                              # Get just the id
+      address = paste0(url, '?fid=', idstring, '&ft=O&et=P&_p=1')          # Make the address for the top level folder
+      x <- content(httr::GET(url = address,
+                             user_agent(agent)),
+                   as = "text",
+                   encoding = "UTF-8")
+    } # /if type == "t"
+  } # /if top level
   
   # this will hold the folder names and id's
   TempFolders = data.frame(parent, ThisFolderID, x, stringsAsFactors = FALSE)  
   colnames(TempFolders) = c("fname", "fid","page")
+  
   
   
   ############ Section 2: Find all the subfolders ##########
@@ -159,7 +173,7 @@ hFindFolders = function(type = "t",
     }
     
     TempParent = bounds$fname[i]                  # get the name of the folder page
-    FolderGrab = hFindFolders(type,# recursive call
+    FolderGrab = FindFolders(type,# recursive call
                              SkipFolder, x, 
                              TempParent, 
                              NextFolderID)        

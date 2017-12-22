@@ -16,13 +16,12 @@
 # Return value is also omitted: httr keeps a handle pool so handles do not need to be passed around
 ### ### ###
 
-hlogin = function(loginurls,
-                  username = character(),
-                  password = character(),
-                  SiteCode = character(),
-                  messageLevel = 0,
-                  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-                  ){
+login = function(loginurls,
+                 username = character(),
+                 password = character(),
+                 SiteCode = character(),
+                 messageLevel = 0,
+                 agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36") {
   #######
   # SETUP
   ### ###
