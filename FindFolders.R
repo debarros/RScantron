@@ -1,5 +1,5 @@
 #This function is used to create a list of all of the Folders (Draft, Published, or Scheduled)
-
+# type = "t"
 FindFolders = function(ScantronHandle, type,
                        SkipFolder = as.character('NA'),
                        x = character(), 
@@ -37,12 +37,29 @@ FindFolders = function(ScantronHandle, type,
   if(length(x) == 0){ 
     if(messageLevel > 0){ print("Retrieving the page for the top level folder.")}
     x = getURI(url, curl=ScantronHandle) 
-  } #/if
+    
+    # Check to make sure it worked
+    if(BadReturnCheck(x, messageLevel - 1)){
+      stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+    }
+    
+    # Check to make sure it's the top level folder
+    # This section is necessary b/c the site will typically just return the page for the last folder viewed
+    # This code has not been tested for draft or scheduled session folders
+    if(type == "t"){
+      optionmatchlist = gregexpr(pattern = "<option.{100}", text = x)      # Find the locations of option tags
+      optionstring = regmatches(x = x, m = optionmatchlist)[[1]][3]        # Find the text of option tags and grab the 3rd one
+      idmatchlist = regexec(pattern = "fid=(.{16})", text = optionstring)  # Find the location of the id
+      idmatches = regmatches(x = optionstring, m = idmatchlist)[[1]]       # Get the id and other crap
+      idstring = idmatches[length(idmatches)]                              # Get just the id
+      address = paste0(url, '?fid=', idstring, '&ft=O&et=P&_p=1')          # Make the address for the top level folder
+      x = getURI(address, curl=ScantronHandle)                             # Get the top level folder
+    } # /if type == "t"
+  } # /if top level
   
-  # Check to make sure it worked
-  if(BadReturnCheck(x, messageLevel - 1)){
-    stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
-  }
+  
+  
+  
   
   # this will hold the folder names and id's
   TempFolders = data.frame(parent, ThisFolderID, x, stringsAsFactors = FALSE)  
@@ -51,23 +68,23 @@ FindFolders = function(ScantronHandle, type,
   
   ############ Section 2: Find all the subfolders ##########
   
-  page = htmlParse(x)                                      # this creates a neat looking html string
-  links = xpathSApply(page, "//a/@href")                   # this finds all of the links in the document
-  folderlinks = substr(links[grep("fid",links)],z[1],z[2]) # this creates a list of the folder ID codes
-  MinPosition = gregexpr(pattern = "selected",x)[[1]][1]   # the folder links before the word "selected" are irrelevant
+  page = htmlParse(x)                                       # this creates a neat looking html string
+  links = xpathSApply(page, "//a/@href")                    # this finds all of the links in the document
+  folderlinks = substr(links[grep("fid", links)],z[1],z[2]) # this creates a list of the folder ID codes
+  MinPosition = gregexpr(pattern = "selected", x)[[1]][1]   # the folder links before the word "selected" are irrelevant
   
   # The object "location" holds the starting points of the folder ID codes, which are all of the same length
   location = data.frame(integer(0))                        # initialize the location data.frame
   for (i in 1:length(folderlinks)){                        # fill up the location data.frame with starting points of the folder ID codes
     location[i,1] = as.integer(gregexpr(pattern = folderlinks[i],x)[[1]][1])
   }
-  drop = which(location[,1]<MinPosition)                   # find the indices of the locations of fid's that occur before the start of the folder list
+  drop = which(location[,1] < MinPosition)                 # find the indices of the locations of fid's that occur before the start of the folder list
   
   if (length(drop) > 0){                                   # if there are any extraneous fid's,
     location = data.frame(location[-drop,])                # get rid of them
   }
   
-  if(nrow(location) == 0){ return(TempFolders) }             # If there are no folders here, return the empty data.frame
+  if(nrow(location) == 0){ return(TempFolders) }           # If there are no folders here, return the empty data.frame
   
   # The object "bounds" will hold the starting and ending position of the name of each subfolder
   # First, find the starting position of every folder name, using the link text
