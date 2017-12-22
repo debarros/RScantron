@@ -48,3 +48,4 @@ TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "Te
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
 TAB.wb = loadWorkbook(xlsxFile = TABpath)      # Read in the TAB (Test Address Book)
+agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
