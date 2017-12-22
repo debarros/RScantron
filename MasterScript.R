@@ -26,8 +26,8 @@ ScannedTests.url = gs_url(ScannedTests.url.text) #enter the URL of the scanned t
 #### Determine current reporting needs ####
 #-----------------------------------------#
 
-StudentFrame = FindStudents(messageLevel = 1) # Get the complete list of students
-EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 1) # Get the complete list of instances in which a student has taken a test
+StudentFrame = FindStudents(messageLevel = 1, agent = agent) # Get the complete list of students
+EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 1, agent = agent) # Get the complete list of instances in which a student has taken a test
 
 # Compare new event frame to old event frame and subset to the recent events
 RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)

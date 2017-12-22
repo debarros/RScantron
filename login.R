@@ -1,100 +1,97 @@
-#login.R
-
-# This function logs into the scantron website
+##########
+# login.R
 #
+# This function duplicates the login function written using RCurl
 # Arguments are:
 #  username - character, username for the scantron account
 #  password - character, password for the scantron account
 #  SiteCode - character, the site code for the scantron account
-#  caLocation - character, file path and name for the certification file
-#  getNewCert - logical, whether a new certification file should be downloaded
-#  ssl.verifypeer - logical, whether curl should verify the identity of the server
+#  messageLevel - integer, indicates depth of console info
 #
-# Returned value is:
-#  ScantronHandle - object of class CURLHandle, holding information about the session with the server
+# certain arguments are no longer needed, including:
+#   - caLocation
+#   - getNewCert
+#   - ssl.verifypeer
+#
+# Return value is also omitted: httr keeps a handle pool so handles do not need to be passed around
+### ### ###
 
 login = function(loginurls,
-                 username = character(), 
-                 password = character(), 
-                 SiteCode = character(), 
-                 caLocation = "cacert.pem",
-                 getNewCert = F, 
-                 ssl.verifypeer = TRUE,
-                 messageLevel = 0){
+                 username = character(),
+                 password = character(),
+                 SiteCode = character(),
+                 messageLevel = 0,
+                 agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36") {
+  #######
+  # SETUP
+  ### ###
   
-  #Get set up ####
-  if(messageLevel > 0){print("Starting login function")}
+  if (messageLevel > 0) {
+    print("Starting login process")
+  }
   
   #set the address for the achievement series login page
   loginurl1 = loginurls$step1
   loginurl2 = loginurls$step2
   
-  
-  # If a new certification file is needed, download it
-  if(getNewCert){
-    caLocation = ObtainNewCert(caLocation)
-  } else if(length(caLocation) == 0){
-    caLocation = ObtainNewCert(caLocation)
-  } else if(!file.exists(caLocation)){
-    caLocation = ObtainNewCert(caLocation)
+  # Prompt User for Input where necessary
+  if (length(SiteCode) == 0) {
+    SiteCode = rstudioapi::askForPassword(prompt = "Site ID: ")
+  }
+  if (length(username) == 0) {
+    username = rstudioapi::askForPassword(prompt = "Staff ID: ")
+  }
+  if (length(password) == 0) {
+    password = rstudioapi::askForPassword(prompt = "password: ")
   }
   
+  if (messageLevel > 0) {
+    print("Getting Login Page")
+  }
+  x <- httr::GET(url = loginurl1, user_agent(agent))
   
-  # Prompt User for Input where necessary
-  if(length(SiteCode) == 0){SiteCode = readline(prompt="Site ID: ")}
-  if(length(username) == 0){username = readline(prompt="Staff ID: ")}  
-  if(length(password) == 0){password = readline(prompt="password: ")}
+  #######
+  # STEP 1: ENTER SITE ID
+  ### ###
   
-  # Set the "agent" (the info that tells web servers what browsers we are using)
-  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36" 
-  
-  if(messageLevel > 0){print("Setting Rcurl parameters")}
-  # Set RCurl parameters
-  Options <- curlOptions(
-    cainfo = caLocation, 
-    useragent = agent,
-    followlocation = TRUE,
-    verbose = FALSE,
-    cookiejar = "",
-    ssl.verifypeer = ssl.verifypeer
+  if (messageLevel > 0) {
+    print("Entering siteID")
+  }
+  Tok <- getToken(x)
+  pars = list(
+    "SiteID" = SiteCode,
+    "returnUrl" = "/Auth/Login/User",
+    "__RequestVerificationToken" = Tok
   )
-  ScantronHandle = getCurlHandle()
-  curlSetOpt(.opts = Options, curl = ScantronHandle)  
   
+  x <-
+    httr::POST(url = loginurl1,
+               user_agent(agent),
+               body = pars,
+               encode = "multipart")
   
+  #######
+  # STEP 2: ENTER CREDENTIALS
+  ### ###
   
-  # Login step 0 ####
-  # Load the login page
-  if(messageLevel > 0){print("Loading the login page")}
-  x = getURI(url = loginurl1, curl = ScantronHandle)
-  
-  
-  
-  # Login step 1 ####
-  # Enter the siteID
-  if(messageLevel > 0){print("Login step 1")}
-  Token = getToken(x)
-  pars=list("SiteID" = SiteCode,
-            "returnUrl" = "/Auth/Login/User",
-            "__RequestVerificationToken" = Token)
-  x = postForm(uri = loginurl1, .params = pars, curl=ScantronHandle, .checkParams = FALSE)
-  
-  
-  
-  # Login step 2 #### 
-  # enter the username and password
-  if(messageLevel > 0){print("Login step 2")}
+  if (messageLevel > 0) {
+    print("Entering Username, PW")
+  }
   OrgID = getOrgID(x)
-  pars=list(
+  pars = list(
     "Username" = username,
     "Password" = password,
     "returnUrl" = "/Auth/Login/User",
-    "__RequestVerificationToken" = Token,
+    "__RequestVerificationToken" = Tok,
     "OrganizationId" = OrgID
   )
-  x=postForm(uri = loginurl2, .params = pars, curl=ScantronHandle, .checkParams = FALSE)
+  x <-
+    httr::POST(url = loginurl2,
+               user_agent(agent),
+               body = pars,
+               encode = "multipart")
   
-  # Return ####
-  if(messageLevel > 0){print("Finishing login function")}
-  return(ScantronHandle)
+  if (messageLevel > 0) {
+    print("Finishing login function")
+  }
 }
