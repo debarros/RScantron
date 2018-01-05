@@ -180,7 +180,7 @@ GetItemResponses_1section = function(ClassID,
                                      messageLevel = 0,
                                      agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36") {
   responses <-
-    content(httr::GET(
+    httr::content(httr::GET(
       url = paste0(
         "https://admin.achievementseries.com/report/class/responses.csv?",
         "c=",
@@ -193,7 +193,7 @@ GetItemResponses_1section = function(ClassID,
     ),
     as = "text",
     encoding = "UTF-8")
-  # responses = content(x, as = "text")
+  # responses = httr::content(x, as = "text")
   responses = gsub(pattern = "\r\n",
                    replacement = "\n",
                    x = responses) # replace CRLF with LF to avoid blank lines

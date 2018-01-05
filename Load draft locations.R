@@ -11,8 +11,12 @@ DraftFrame$Path = paste0(DraftFrame$folder, "/", DraftFrame$TestName) # Construc
 # This function takes a curl handle and a published test id and returns the name of the draft on which the published test is based
 GetDraftName = function(ScantronHandle, tid, messageLevel = 0){
   urlstub = "https://admin.achievementseries.com/published-test/info.ssp?id=" # url stub for getting published test pages
+  agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   url = paste0(urlstub, tid)                                                  # build the url for the current test
-  TestPage = getURI(url = url, curl=ScantronHandle)                           # fetch the page
+  TestPage = httr::content(httr::GET(url = url,                               # fetch the page
+                                     user_agent(agent)),
+                           as = "text",
+                           encoding = "UTF-8")
   DraftNameStart = gregexpr("Test Draft Name", TestPage)[[1]][1] + 82         # find where the draft name starts
   SpanLocations = c(gregexpr("</span>", TestPage)[[1]])                       # find all instances of <\span>
   DraftNameEnd = min(SpanLocations[SpanLocations > DraftNameStart]) - 1       # find where the draft name ends

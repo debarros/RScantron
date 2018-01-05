@@ -35,7 +35,7 @@ FindFolders = function(type = "t",
   #If this is the first call of the function, get the page for the top level folder
   if(length(x) == 0){ 
     if(messageLevel > 0){ print("Retrieving the page for the top level folder.")}
-    x <- content(httr::GET(url = url,
+    x <- httr::content(httr::GET(url = url,
                            user_agent(agent)),
                  as = "text",
                  encoding = "UTF-8")
@@ -56,7 +56,7 @@ FindFolders = function(type = "t",
       idstring = idmatches[length(idmatches)]                              # Get just the id
       address = paste0(url, '?fid=', idstring, '&ft=O&et=P&_p=1')          # Make the address for the top level folder
 
-      x <- content(httr::GET(url = address,
+      x <- httr::content(httr::GET(url = address,
                              user_agent(agent)),
                    as = "text",
                    encoding = "UTF-8")
@@ -161,11 +161,11 @@ FindFolders = function(type = "t",
     if(messageLevel > 0){ 
       print("Retrieving the page for the next folder.")
     } # /if    
-    x <- content(httr::GET(url = address,
+    x <- httr::content(httr::GET(url = address,
                            user_agent(agent)),
                  as = "text",
                  encoding = "UTF-8")
-    # x <- content(x, as = "text")  # get the folder page
+    # x <- httr::content(x, as = "text")  # get the folder page
     
     # Check to make sure it worked
     if(BadReturnCheck(x, messageLevel - 1)){

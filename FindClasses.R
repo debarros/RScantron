@@ -1,13 +1,21 @@
 #FindClasses.R
 
-FindClasses = function(ScantronHandle, messageLevel = 0){
+FindClasses = function(agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36",
+                       messageLevel = 0){
   
   #Set the URL's to be used
   url1 = "https://admin.achievementseries.com/classes/list.ssp"                #set the url for the class list page
   url2 = "https://admin.achievementseries.com/classes/list.csv?_list=Classes"  #set the url for the csv of classes
   
   #Pull the classes page in order to get the ClassID from the links
-  x = getURI(url1, curl=ScantronHandle)                           #fetch the page with the list of classes
+  x <-                        #fetch the page with the list of classes
+    httr::content(
+      httr::GET(url = url1,
+                user_agent(agent)),
+      as = "text",
+      encoding = "UTF-8"
+    )
+  
   
   # Check to make sure it worked
   if(BadReturnCheck(x, messageLevel - 1)){
@@ -19,7 +27,13 @@ FindClasses = function(ScantronHandle, messageLevel = 0){
   ClassLinks = substr(links[grep("info.ssp\\?id=",links)],20,35)  #this pulls out the ClassID's from the links
   
   #Pull the csv with the rest of the class info
-  x = getURI(url2, curl=ScantronHandle)                              #pull the csv of classes
+  x <-                #pull the csv of classes
+    httr::content(
+      httr::GET(url = url2,
+                user_agent(agent)),
+      as = "text",
+      encoding = "UTF-8"
+    )
   ClassFrame = read.csv(textConnection(x), stringsAsFactors = FALSE) #treat the page as a csv and make a data.frame
   ClassFrame$ClassID = ClassLinks                                    #add the ClassID's to the dataframe of classes
   
