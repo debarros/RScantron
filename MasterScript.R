@@ -19,8 +19,9 @@ login(loginurls, username, password, SiteCode, messageLevel = 1, agent = agent)
 
 
 # Sign in to google
-gs_auth() # this might launch a browser so you can sign into your account
-ScannedTests.url = gs_url(ScannedTests.url.text) #enter the URL of the scanned test document here
+# this might launch a browser so you can sign into your account
+SWSM(gs_auth())
+ScannedTests.url = SWSM(gs_url(ScannedTests.url.text)) #enter the URL of the scanned test document here
 
 #-----------------------------------------#
 #### Determine current reporting needs ####
@@ -49,7 +50,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 1, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "H3 (2017-12-01) Civil War and Poetry", TAB.wb, messageLevel = 2)
+# GetAndStoreItemResponses_SingleTest(testname = "Sp12 (2018-01-17) Midterm", TAB.wb, messageLevel = 2)
 
 # Log out of scantron
 LogoutPage = logout(messageLevel = 1, agent = agent)
@@ -63,7 +64,7 @@ for(i in 1:length(testsToUse)){
 }
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ea (2017-10-20) Coordinates Contours and Gradients"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ge (2018-01-08) Midterm"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 
@@ -71,48 +72,8 @@ for(i in 1:length(testsToUse)){
 #### Monitoring section ####
 #--------------------------#
 
-# Get the current Scanned Tests document and then clear it out
-ScannedTests = gs_read(ss = ScannedTests.url, ws = 1)
-if(nrow(ScannedTests) > 0){
-  Blank = matrix(data = "", nrow = nrow(ScannedTests), ncol = ncol(ScannedTests)) 
-  gs_edit_cells(ss = ScannedTests.url, ws = 1, input = Blank, anchor = "A2") # Start at A2 to leave the header row in place
-}
-
-# Modify ScannedTests to include the newly scanned tests
-NewScannedTests = data.frame(
-  Test = RecentTestFrame$Published.Test, 
-  Folder = read.xlsx(TAB.wb)$Local.folder[match(RecentTestFrame$Published.Test,read.xlsx(TAB.wb)$TestName)])
-if(nrow(NewScannedTests) > 0){
-  NewScannedTests$MakeReport = F
-  NewScannedTests$SendReport = T
-  NewScannedTests$Update = F
-  NewScannedTests$Monitor = T
-}
-
-# If ScannedTests has extra columns, put them in NewScannedTests also
-if(ncol(ScannedTests) > 6){
-  moreColumns = colnames(ScannedTests)[7:ncol(ScannedTests)]
-  for(curColumn in moreColumns){
-    NewScannedTests[,curColumn] = ""  
-  } # /for each extra column
-} # /if there are extra columns
-
-AllScannedTests = rbind(NewScannedTests, ScannedTests)
-UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
-for(i in 1:nrow(UniqueScannedTests)){ # For each unique scanned test
-  for(j in c("MakeReport","SendReport","Update","Monitor")){ # check whether any instance of it (or or new) requires certain actions
-    UniqueScannedTests[i,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
-  }
-}
-
-# Remove from UniqueScannedTests any records that require no action
-UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("MakeReport","SendReport","Update","Monitor")], MARGIN = 1, FUN = any),]
-
-# Update the Scanned Tests document with the modified ScannedTests 
-gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1") # Start at A1 b/c the header row is also added
-
-# store the date and time of the current run
-gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") 
+# Update Score Monitoring
+UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, messageLevel = 1)
 
 # update prior events
 RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
