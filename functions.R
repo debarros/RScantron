@@ -3,6 +3,7 @@
 
 #libraries
 library(XML)
+library(bitops)
 library(RCurl)
 library(stringr)
 library(reshape2)
@@ -39,6 +40,7 @@ source("DetermineCurrentSections.R")
 source("FindMissingTests.R")
 source("FixHtmlChars.R")
 source("BadReturnCheck.R")
+source("UpdateMonitoring.R")
 
 #Data
 loginurls = list("step1" = "https://admin.achievementseries.com/Auth/Login/Org", 
