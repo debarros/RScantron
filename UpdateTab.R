@@ -10,9 +10,8 @@ UpdateTab = function(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 0)
     NewTestFrame = rbind.data.frame(TAB, TestFrame)
     NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]
     NewTestFrame = NewTestFrame[order(NewTestFrame$TestName),]
-    for(i in 1:ncol(NewTestFrame)){
-      NewTestFrame[,i] = na.to.empty(NewTestFrame[,i])
-    } # /for loop
+    NewTestFrame = DFna.to.empty(NewTestFrame)                       # Convert NA's to empty cells
+    NewTestFrame = NewTestFrame[order(NewTestFrame$Local.folder == "", decreasing = T),]
     writeData(wb = TAB.wb, sheet = "TAB", x = NewTestFrame)
     saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
   } # /if there are missing tests
