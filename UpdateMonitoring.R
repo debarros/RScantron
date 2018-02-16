@@ -49,7 +49,7 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, messageLe
   UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("MakeReport","SendReport","Update","Monitor")], MARGIN = 1, FUN = any),]
   
   # Update the Scanned Tests document with the modified ScannedTests 
-  if(messageLevel > 0){ print("Update the Scanned Tests document")}
+  if(messageLevel > 0){ print("Updating the Scanned Tests document")}
   SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1")) # Start at A1 b/c the header row is also added
   
   # store the date and time of the current run
