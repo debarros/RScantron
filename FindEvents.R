@@ -1,14 +1,13 @@
-#FindEventsFindEvents.R
+# FindEvents.R
 
-FindEvents = function (StudentFrame,
-                       SchoolYear = NULL,
-                       messageLevel = 0,
-                       agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36") {
-  EventFrame = data.frame(character(),
-                          character(),
-                          character(),
-                          character(),
-                          stringsAsFactors = FALSE)
+FindEvents = function (StudentFrame, SchoolYear = NULL, messageLevel = 0, agent = NULL) {
+  
+  if(is.null(agent)){
+    agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+  }
+  
+  EventFrame = data.frame(character(), character(), character(), character(), stringsAsFactors = FALSE)
+  
   for (i in 1:nrow(StudentFrame)) {
     if (messageLevel > 0) {
       print(paste0("Student ", i, " of ", nrow(StudentFrame)))
@@ -25,11 +24,15 @@ FindEvents = function (StudentFrame,
       EventFrame = rbind(EventFrame, x)
     } # /if
   } # /for each student
+  
   EventFrame$Date = as.Date(EventFrame$Date, "%m/%d/%y")  #fix the date format
+  
   if (!is.null(SchoolYear)) {
     cutoffdate = as.Date(paste0(SchoolYear, "-07-01"))
     EventFrame = EventFrame[EventFrame$Date >= cutoffdate, ]
     rownames(EventFrame) = NULL
   } # /if
+  
   return(EventFrame)
+  
 } # /function
