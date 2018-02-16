@@ -1,6 +1,9 @@
 #UpdateTab.R
 
 UpdateTab = function(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 0){
+  if(messageLevel > 0){
+    print("Updating the TAB")
+  }
   TAB = read.xlsx(xlsxFile = TAB.wb, sheet = "TAB")
   if(length(missingTests) > 0){ 
     TestFrame.temp = TestFrame
@@ -16,5 +19,3 @@ UpdateTab = function(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 0)
     saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
   } # /if there are missing tests
 } # /function
-
-
