@@ -1,4 +1,4 @@
-##########
+#
 # login.R
 #
 # This function duplicates the login function written using RCurl
@@ -14,14 +14,14 @@
 #   - ssl.verifypeer
 #
 # Return value is also omitted: httr keeps a handle pool so handles do not need to be passed around
-### ### ###
+#
 
-login = function(loginurls,
-                 username = character(),
-                 password = character(),
-                 SiteCode = character(),
-                 messageLevel = 0,
-                 agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36") {
+login = function(loginurls, username = character(), password = character(), SiteCode = character(), messageLevel = 0, agent = NULL) {
+  
+  if(is.null(agent)){
+    agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+  }
+  
   #######
   # SETUP
   ### ###
@@ -58,17 +58,11 @@ login = function(loginurls,
     print("Entering siteID")
   }
   Tok <- getToken(x)
-  pars = list(
-    "SiteID" = SiteCode,
-    "returnUrl" = "/Auth/Login/User",
-    "__RequestVerificationToken" = Tok
-  )
+  pars = list("SiteID"                     = SiteCode,
+              "returnUrl"                  = "/Auth/Login/User",
+              "__RequestVerificationToken" = Tok)
   
-  x <-
-    httr::POST(url = loginurl1,
-               user_agent(agent),
-               body = pars,
-               encode = "multipart")
+  x <- httr::POST(url = loginurl1, user_agent(agent), body = pars, encode = "multipart")
   
   #######
   # STEP 2: ENTER CREDENTIALS
@@ -78,20 +72,15 @@ login = function(loginurls,
     print("Entering Username, PW")
   }
   OrgID = getOrgID(x)
-  pars = list(
-    "Username" = username,
-    "Password" = password,
-    "returnUrl" = "/Auth/Login/User",
-    "__RequestVerificationToken" = Tok,
-    "OrganizationId" = OrgID
-  )
-  x <-
-    httr::POST(url = loginurl2,
-               user_agent(agent),
-               body = pars,
-               encode = "multipart")
+  pars = list("Username"                   = username,
+              "Password"                   = password,
+              "returnUrl"                  = "/Auth/Login/User",
+              "__RequestVerificationToken" = Tok,
+              "OrganizationId"             = OrgID)
+  
+  x <- httr::POST(url = loginurl2, user_agent(agent), body = pars, encode = "multipart")
   
   if (messageLevel > 0) {
     print("Finishing login function")
   }
-}
+} # /login function
