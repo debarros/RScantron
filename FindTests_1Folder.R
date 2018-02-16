@@ -1,19 +1,20 @@
 #FindTests_1Folder.R
 
+# The only argument to this function is TestFolderRow, a 1-row data frame with three columns: 
+#   fname is the name of the current folder.  
+#   fid is the folder id.
+#   page is the actual page displaying the folder
+
+# This function will return a data.frame listing the names, id's, and containing folder name of every test in this folder
+#   (obviously, the containing folder will be the same for every test in one call of this function)
+
+
 # Note: this appears to have an unneccesary conditional.  The existence of test links is checked twice.
 
 FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
   
-  # The only argument to this function is TestFolderRow, a 1-row data frame with three columns: 
-  #   fname is the name of the current folder.  
-  #   fid is the folder id.
-  #   page is the actual page displaying the folder
-  
-  # This function will return a data.frame listing the names, id's, and containing folder name of every test in this folder
-  #   (obviously, the containing folder will be the same for every test in one call of this function)
-  
   #Initialize the TempTests data.frame.  This will hold the list of the names of the tests, along with their folders and id's.
-  TempTests = data.frame(character(),character(),character(),stringsAsFactors = FALSE)  
+  TempTests = data.frame(character(), character(), character(), stringsAsFactors = FALSE)  
   colnames(TempTests) = c("TestName","folder","tid")
   
   page = htmlParse(TestFolderRow[1,3])                 # this creates a neat looking html string
@@ -49,14 +50,12 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
       
       # Next, find the ending position of every test name and a few other extraneous links
       ends = dcast(
-        melt(
-          str_locate_all(
-            pattern = "</a></span></td>",  #this is the code that always follows test names
-            TestFolderRow[1,3])[[1]]), 
-        formula = Var1 ~ Var2)[,2]-1  #the -1 moves from 1st char after the link to the last char of the link
+        melt(str_locate_all(pattern = "</a></span></td>",  #this is the code that always follows test names
+                            TestFolderRow[1,3])[[1]]), 
+        formula = Var1 ~ Var2)[,2] - 1  #the -1 moves from 1st char after the link to the last char of the link
       
       # Append a column to the Location data.frame to hold the end point of each test name
-      Location = cbind(Location,TestNameEnd= data.frame(TestNameEnd= rep(as.integer(NA),times = dim(Location)[1])))
+      Location = cbind(Location, TestNameEnd = data.frame(TestNameEnd = rep(as.integer(NA), times = dim(Location)[1])))
       
       # Now, match the starting position of each test name with the next ending position
       for (i in 1:dim(Location)[1]){
@@ -65,12 +64,12 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
       
       
       for (i in 1:nrow(Location)){
-        TempTests[i,1]=  as.character(substr(TestFolderRow[1,3], Location[i,2]+1, Location[i,3]))
-        TempTests[i,3]=  as.character(substr(TestFolderRow[1,3], Location[i,1], Location[i,1]+15))
+        TempTests[i,1] =  as.character(substr(TestFolderRow[1,3], Location[i,2] + 1, Location[i,3]))
+        TempTests[i,3] =  as.character(substr(TestFolderRow[1,3], Location[i,1], Location[i,1] + 15))
       }
       TempTests[,2] = TestFolderRow$fname[1]    
       
-      TempTests$TestName = FixHtmlChars(TempTests$TestName) # fix special characters
+      TempTests$TestName = FixHtmlChars(x = TempTests$TestName, messageLevel = messageLevel - 1) # fix special characters
       
       return(TempTests)
     } # /if-else there are no tests in the folder
