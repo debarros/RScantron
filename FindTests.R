@@ -13,5 +13,4 @@ FindTests = function (TestFolderFrame, messageLevel = 0){
     TestFrame = rbind(TestFrame, x)
   }
   return(TestFrame)
-}
-
+} # /function
