@@ -1,6 +1,8 @@
 # logout.R
 # This function ends the session with Scantron
-# The only argument it takes is messagelevel
+# It takes the following arguments:
+#   messagelevel
+#   agent
 # It returns the content of the logout page
 
 logout = function(messageLevel = 0, agent = NULL) {
@@ -13,8 +15,8 @@ logout = function(messageLevel = 0, agent = NULL) {
   x <- httr::content(
     httr::GET(url = 'https://admin.achievementseries.com/home/home.ssp', user_agent(agent)),
     as = "text",
-    encoding = "UTF-8"
-  )
+    encoding = "UTF-8")
+  
   # x <- httr::content(x, as = "text")
   
   if (BadReturnCheck(x)) {
