@@ -5,6 +5,10 @@ DetermineCurrentSections = function(testname, CustomSectioning,
                                     Coursecode2Testcode, Coursecode2Course, 
                                     messageLevel = 0){
   
+  if(messageLevel > 0){
+    print(paste0("Determining sections for test code ", testcode))
+  }
+  
   # Determine the sections for this test code
   if(testname %in% CustomSectioning$TestTitle){ # if there are custom sections, just get those
     classIDs = CustomSectioning$ClassID_List[CustomSectioning$TestTitle == testname]
@@ -22,6 +26,10 @@ DetermineCurrentSections = function(testname, CustomSectioning,
     # Get all the sections of those courses
     currentSections = Sections[Sections$ClassName %in% courses,]
   } # /if-else to determine sections
+  
+  if(messageLevel > 0){
+    print(paste0("Done determining sections for this test code"))
+  }
   
   return(currentSections)
 } # /function
