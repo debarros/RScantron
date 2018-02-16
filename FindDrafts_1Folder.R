@@ -1,16 +1,20 @@
 #FindDrafts_1Folder.R
 
+#The first argument to this function is DraftFolderRow, a 1-row data frame with three columns: 
+#   fname is the name of the current folder.  
+#   fid is the folder id.
+#   page is the actual page displaying the folder
+
+#This function will return a data.frame listing the names, id's, and containing folder name of every test draft in this folder
+#   (obviously, the containing folder will be the same for every test in one call of this function)
+
 FindDrafts_1Folder = function (DraftFolderRow, messageLevel = 0){
   
-  #The only argument to this function is DraftFolderRow, a 1-row data frame with three columns: 
-  #   fname is the name of the current folder.  
-  #   fid is the folder id.
-  #   page is the actual page displaying the folder
+  if(messageLevel > 0){
+    print(paste0("Finding drafts in ", DraftFolderRow$fname))
+  }
   
-  #This function will return a data.frame listing the names, id's, and containing folder name of every test draft in this folder
-  #   (obviously, the containing folder will be the same for every test in one call of this function)
-  
-  #Initialize the TempTests data.frame.  This will hold the list of the names of the tests, along with their folders and id's.
+  # Initialize the TempTests data.frame.  This will hold the list of the names of the tests, along with their folders and id's.
   TempTests = data.frame(character(),character(),character(),stringsAsFactors = FALSE)  
   colnames(TempTests) = c("TestName","folder","tid")
   
@@ -38,7 +42,7 @@ FindDrafts_1Folder = function (DraftFolderRow, messageLevel = 0){
       return(TempTests)     # return the empty data.frame
     } else {                # If there are tests, continue to find them
       
-      #Append to the Location data.frame the starting position of each test name
+      # Append to the Location data.frame the starting position of each test name
       Location = cbind(Location, Location + 79)
       colnames(Location) = c("TestIdStart","TestNameStart")
       
