@@ -15,7 +15,7 @@ source("credentials.R")
 #--------------#
 
 # log in to Scantron website
-login(loginurls, username, password, SiteCode, messageLevel = 1, agent = agent)
+login(loginurls, username, password, SiteCode, messageLevel = 3, agent = agent)
 
 
 # Sign in to google
@@ -50,7 +50,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 1, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "Sp12 (2018-01-17) Midterm", TAB.wb, messageLevel = 2)
+# GetAndStoreItemResponses_SingleTest(testname = "SAT (2017-11-30) Writing and Language 2", TAB.wb, messageLevel = 2)
 
 # Log out of scantron
 LogoutPage = logout(messageLevel = 1, agent = agent)
@@ -64,7 +64,7 @@ for(i in 1:length(testsToUse)){
 }
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ge (2018-01-08) Midterm"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "SAT (2017-11-30) Writing and Language 2"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 
