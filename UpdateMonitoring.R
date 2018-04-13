@@ -1,8 +1,8 @@
-# Monitor.R
+# UpdateMonitoring.R
 
 # This function does all of the monitoring stuff
 
-UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, messageLevel = 0){
+UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = F, messageLevel = 0){
   
   if(messageLevel > 0){ print("Updating monitoring")}
   
@@ -13,6 +13,13 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, messageLe
     Blank = matrix(data = "", nrow = nrow(ScannedTests), ncol = ncol(ScannedTests)) 
     if(messageLevel > 0){ print("Clearing the scanned test document")}
     SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = Blank, anchor = "A2")) # Start at A2 to leave the header row in place
+  }
+  
+  # If tests marked as needing reports were done, clear those values and set Send and Monitor to TRUE
+  if(MakeReportDone){
+    ScannedTests$SendReport[ScannedTests$MakeReport] = TRUE
+    ScannedTests$Monitor[ScannedTests$MakeReport] = TRUE
+    ScannedTests$MakeReport = FALSE
   }
   
   # Modify ScannedTests to include the newly scanned tests
