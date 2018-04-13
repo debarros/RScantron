@@ -48,23 +48,38 @@ missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame, messageLevel
 UpdateTab(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 1)
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
+
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 1, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "SAT (2017-11-30) Writing and Language 2", TAB.wb, messageLevel = 2)
+# GetAndStoreItemResponses_SingleTest(testname = "WHS (2018-03-09) Roots of Democracy", TAB.wb, messageLevel = 2)
 
 # Log out of scantron
 LogoutPage = logout(messageLevel = 1, agent = agent)
 
-# Generate the reports
+
+# Get a vector of the tests that need reports
 testsToUse = as.character(RecentTestFrame$Published.Test)
-for(i in 1:length(testsToUse)){
+
+# Pull the scanned tests document to look for other tests that need to have reports generated
+ScannedTests = SWSM(gs_read(ss = ScannedTests.url, ws = 1, verbose = F))
+ScannedTests = ScannedTests[ScannedTests$MakeReport,]
+if(nrow(ScannedTests) > 0){
+  testsToUse = unique(c(testsToUse, ScannedTests$Test))
+}
+
+# Generate the reports
+i = 1
+sort(testsToUse)
+print(i)
+while(i <= length(testsToUse)){
   print(paste0(i, " of ", length(testsToUse), " - ", testsToUse[i]))
   DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == testsToUse[i]]
   generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
+  i = i + 1
 }
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "SAT (2017-11-30) Writing and Language 2"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ge (2018-02-02) U3 Rigid Motion and Congruence +"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 
@@ -73,7 +88,10 @@ for(i in 1:length(testsToUse)){
 #--------------------------#
 
 # Update Score Monitoring
-UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, messageLevel = 1)
+UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
 
 # update prior events
 RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
+
+
+# Are you sure you ran UpdateMonitoring?  Check the history.
