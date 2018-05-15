@@ -78,6 +78,9 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
   for (j in 1:length(classIDs)) {
+    if (messageLevel > 0) {
+      print(paste0("section ", j, " of ", length(classIDs)))
+    } # /if messageLevel > 0
     currentClassID = classIDs[j]     # get the ClassID for the section
     currentClassName = classnames[j] # get the name for the section
     
