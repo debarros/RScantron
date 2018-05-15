@@ -50,7 +50,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 
 # Download the item response files and save them
-GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 1, agent = agent)
+GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "WHS (2018-03-09) Roots of Democracy", TAB.wb, messageLevel = 2)
 
 # Log out of scantron
@@ -86,6 +86,12 @@ while(i <= length(testsToUse)){
 #--------------------------#
 #### Monitoring section ####
 #--------------------------#
+
+# The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
+# droptests = c("Nu (2018-05-04) Life Skills 1", "ALn (2018-04-18) Practice Exam 2 +>")
+# RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),]
+# EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]
+
 
 # Update Score Monitoring
 UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
