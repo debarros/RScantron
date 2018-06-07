@@ -53,9 +53,6 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "WHS (2018-03-09) Roots of Democracy", TAB.wb, messageLevel = 2)
 
-# Log out of scantron
-LogoutPage = logout(messageLevel = 1, agent = agent)
-
 
 # Get a vector of the tests that need reports
 testsToUse = as.character(RecentTestFrame$Published.Test)
@@ -78,9 +75,18 @@ while(i <= length(testsToUse)){
   i = i + 1
 }
 
+# If the while loop throws an error and a row has to be deleted from a csv export, 
+# paste the student number in the next line and run it and the one after
+# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "151610368",]
+# Spoil(SpoilFrame,3)
+
+
 # The following lines can be used to generate the report for one test, given the test name
 # DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ge (2018-02-02) U3 Rigid Motion and Congruence +"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
+
+# Log out of scantron
+LogoutPage = logout(messageLevel = 1, agent = agent)
 
 
 #--------------------------#
