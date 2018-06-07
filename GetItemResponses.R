@@ -11,13 +11,11 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageL
   Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
   Coursecode2Course =  set_colnames(
     x = as.data.frame(t(
-      read.xlsx(
-        xlsxFile = TAB.wb,
-        sheet = "Course Codes",
-        colNames = F,
-        rowNames = F,
-        rows = 1:2
-      )),
+      read.xlsx(xlsxFile = TAB.wb,
+                sheet = "Course Codes",
+                colNames = F,
+                rowNames = F,
+                rows = 1:2)),
       stringsAsFactors = F),
     value = c("Course", "CourseCode"))
   Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
@@ -73,13 +71,23 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageL
 #--------------------------------------#
 #### GetAndStoreItemResponses_1test ####
 #--------------------------------------#
-GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, messageLevel = 0, agent = NULL) {
+GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, messageLevel = 0, agent = NULL, removeOld = T) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
+  
+  # Clear out the old export files
+  if(removeOld){
+    oldExports = list.files(paste0(testpath, "/exports"), full.names = T)
+    deleteSuccess = file.remove(oldExports)
+    if(!all(deleteSuccess)){
+      stop("Error!  Some of the old export files could not be deleted.")
+    }
+  }
+  
   for (j in 1:length(classIDs)) {
     if (messageLevel > 0) {
-      print(paste0("section ", j, " of ", length(classIDs)))
+      print(paste0("  section ", j, " of ", length(classIDs)))
     } # /if messageLevel > 0
     currentClassID = classIDs[j]     # get the ClassID for the section
     currentClassName = classnames[j] # get the name for the section
@@ -114,12 +122,11 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 
   
   Coursecode2Course =  set_colnames(
     x = as.data.frame(t(
-      read.xlsx(
-        xlsxFile = TAB.wb,
-        sheet = "Course Codes",
-        colNames = F,
-        rowNames = F,
-        rows = 1:2)),
+      read.xlsx(xlsxFile = TAB.wb,
+                sheet = "Course Codes",
+                colNames = F,
+                rowNames = F,
+                rows = 1:2)),
       stringsAsFactors = F),
     value = c("Course", "CourseCode"))
   
