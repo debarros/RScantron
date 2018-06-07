@@ -9,6 +9,7 @@ BadReturnCheck = function(page, messageLevel = 0){
     print("Checking to see if you are logged in.")
   }
   
+  badReturnCheck = rep(F,4)
   badReturnCheck[1] = grepl(pattern = "Admin Site, Enter Your Username/Password", x = page, ignore.case = T)
   badReturnCheck[2] = grepl(pattern = "Admin Site, Enter Your Site ID", x = page, ignore.case = T)
   badReturnCheck[3] = grepl(pattern = "header_loggedout_container", x = page, ignore.case = T)
