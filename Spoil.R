@@ -19,6 +19,9 @@ Spoil_1Event = function(Event, messageLevel = 0, agent = NULL){
     stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
   }
   
+  # Fix weird html characters
+  studentEventsPage = FixHtmlChars(x = studentEventsPage, messageLevel = messageLevel - 1)
+  
   # Find the spoil link for the relevant event
   matchLocations = gregexpr(pattern = Event$Published.Test, text = studentEventsPage, fixed = T)
   matchLocations = matchLocations[[1]][1]
@@ -34,6 +37,8 @@ Spoil_1Event = function(Event, messageLevel = 0, agent = NULL){
       user_agent(agent)),
     as = "text",
     encoding = "UTF-8")
+  
+  spoilPage1 = FixHtmlChars(x = spoilPage1, messageLevel = messageLevel - 1)
   
   # Grab the student ID and test name and print them
   spanTagLocations =  gregexpr(pattern = '<span class="ss2">', text = spoilPage1, fixed = T)[[1]]
@@ -93,8 +98,8 @@ Spoil = function(SpoilFrame, messageLevel = 0, agent = NULL){
   
   SpoilFrame = SpoilFrame[SpoilFrame$Status == "Finished",]
   
-  for(i in 1:nrow(SpoilFrame)){
-    Spoil_1Event(Event = SpoilFrame[i,], messageLevel = messageLevel - 1, agent = agent)
+  for(thisRow in 1:nrow(SpoilFrame)){
+    Spoil_1Event(Event = SpoilFrame[thisRow,], messageLevel = messageLevel - 1, agent = agent)
   }
 } # /Spoil
 
