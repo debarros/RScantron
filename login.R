@@ -16,15 +16,24 @@
 # Return value is also omitted: httr keeps a handle pool so handles do not need to be passed around
 #
 
+#' @title Login
+#' @description Log in to the Scantron website
+#' @param loginurls list of length 2 containing members step1 and step2, which correspond to the first and second login pages
+#' @param username the username
+#' @param password the password
+#' @param SiteCode the achievement series site code
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
+#' @param agent the browser user agent
+#' @return This function starts a new session with the Scantron website
 login = function(loginurls, username = character(), password = character(), SiteCode = character(), messageLevel = 0, agent = NULL) {
   
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
   
-  #######
-  # SETUP
-  ### ###
+  #-------#
+  # SETUP #
+  #-------#
   
   if (messageLevel > 0) {
     print("Starting login process")
@@ -50,9 +59,9 @@ login = function(loginurls, username = character(), password = character(), Site
   }
   x <- httr::GET(url = loginurl1, user_agent(agent))
   
-  #######
-  # STEP 1: ENTER SITE ID
-  ### ###
+  #-----------------------#
+  # STEP 1: ENTER SITE ID #
+  #-----------------------#
   
   if (messageLevel > 0) {
     print("Entering siteID")
@@ -64,9 +73,9 @@ login = function(loginurls, username = character(), password = character(), Site
   
   x <- httr::POST(url = loginurl1, user_agent(agent), body = pars, encode = "multipart")
   
-  #######
-  # STEP 2: ENTER CREDENTIALS
-  ### ###
+  #---------------------------#
+  # STEP 2: ENTER CREDENTIALS #
+  #---------------------------#
   
   if (messageLevel > 0) {
     print("Entering Username, PW")
