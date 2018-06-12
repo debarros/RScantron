@@ -1,10 +1,11 @@
 # logout.R
-# This function ends the session with Scantron
-# It takes the following arguments:
-#   messagelevel
-#   agent
-# It returns the content of the logout page
 
+#' @title Logout
+#' @description Log out of the Scantron website
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
+#' @param agent the browser user agent
+#' @return The html content of the logout page
+#' @details This function ends the session with Scantron
 logout = function(messageLevel = 0, agent = NULL) {
   
   if(is.null(agent)){
@@ -30,5 +31,11 @@ logout = function(messageLevel = 0, agent = NULL) {
   z = paste0("https://admin.achievementseries.com", substring(x, y - 6, y + 15))
   
   #Fetch the URI, causing the session to be terminated
-  x <- httr::GET(url = z, user_agent(agent))
+  x <-  httr::content(
+    httr::GET(url = z, user_agent(agent)),
+    as = "text",
+    encoding = "UTF-8")
+  
+  return(x)
+  
 } # /function
