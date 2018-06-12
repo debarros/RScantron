@@ -2,6 +2,15 @@
 
 # This function does all of the monitoring stuff
 
+
+#' @title Update Monitoring
+#' @description Update the score monitoring spreadsheet
+#' @param ScannedTests.url output from the FindMissingTests function
+#' @param RecentTestFrame output from the FindTests function
+#' @param MakeReportDone the result of running loadWorkbook on the TAB file
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
+#' @return Nothing gets returned by this function
+#' @details This function updates the spreadsheet of tests with any new tests found in the TMS
 UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = F, messageLevel = 0){
   
   if(messageLevel > 0){ print("Updating monitoring")}
@@ -54,6 +63,9 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   
   # Remove from UniqueScannedTests any records that require no action
   UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("MakeReport","SendReport","Update","Monitor")], MARGIN = 1, FUN = any),]
+  
+  # Sort UniqueScannedTests
+  UniqueScannedTests = UniqueScannedTests[order(UniqueScannedTests$SendReport, UniqueScannedTests$MakeReport, UniqueScannedTests$Folder, decreasing = 1),]
   
   # Update the Scanned Tests document with the modified ScannedTests 
   if(messageLevel > 0){ print("Updating the Scanned Tests document")}
