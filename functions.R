@@ -42,6 +42,7 @@ source("FixHtmlChars.R")
 source("BadReturnCheck.R")
 source("UpdateMonitoring.R")
 source("Spoil.R")
+source("GetDraftName.R")
 
 #Data
 loginurls = list("step1" = "https://admin.achievementseries.com/Auth/Login/Org", 
