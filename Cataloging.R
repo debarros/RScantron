@@ -14,13 +14,13 @@ DraftFrame = FindDrafts(DraftFolderFrame)
 DraftFrame = StoreDrafts(DraftFrame)
 
 # Catalog class sections ####
-#Get the complete list of class sections with their class ID's
+# Get the complete list of class sections with their class ID's
 ClassFrame = FindClasses(agent = agent)
 ClassFrame = ClassFrame[order(ClassFrame$Dept, ClassFrame$ShortName, ClassFrame$Level, ClassFrame$Primary.Staff),]
 write.csv(ClassFrame,file = "ClassSections.csv", row.names = FALSE)
 
 # Catalog all test scores ###
-#Compile all scores ever
+# Compile all scores ever
 testIDs = TestFrame$tid
 AllResults = FindResults(testIDs, agent = agent)
 
