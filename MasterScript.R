@@ -16,7 +16,9 @@ source("credentials.R")
 
 # log in to Scantron website
 login(loginurls, username, password, SiteCode, messageLevel = 3, agent = agent)
-
+# If you get "Error in curl::curl_fetch_memory(url, handle = handle) : Maximum (10) redirects followed", run the next line
+# detach("package:httr", unload = TRUE)
+# library(httr)
 
 # Sign in to google
 # this might launch a browser so you can sign into your account
@@ -27,11 +29,13 @@ ScannedTests.url = SWSM(gs_url(ScannedTests.url.text)) #enter the URL of the sca
 #### Determine current reporting needs ####
 #-----------------------------------------#
 
-StudentFrame = FindStudents(messageLevel = 1, agent = agent) # Get the complete list of students
-EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 1, agent = agent) # Get the complete list of instances in which a student has taken a test
+# Get the complete list of students and the complete list of instances in which a student has taken a test
+StudentFrame = FindStudents(messageLevel = 1, agent = agent) 
+EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 1, agent = agent) 
 
 # Compare new event frame to old event frame and subset to the recent events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)
+RecentEventFrame = FindRecentEvents(
+  EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)
 # RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, RecentDays = 5, status = "Finished", updatePriorEvents = F)
 
 #Get a list of the recently scanned tests, and how many instances per test
@@ -50,7 +54,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 
 # Download the item response files and save them
-GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
+GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 3, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "WHS (2018-03-09) Roots of Democracy", TAB.wb, messageLevel = 2)
 
 
@@ -77,12 +81,12 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student number in the next line and run it and the one after
-# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "151610368",]
-# Spoil(SpoilFrame,3)
+# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "171810748",]
+# Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Ge (2018-02-02) U3 Rigid Motion and Congruence +"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Sp1 (2018-05-31) Final >"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 # Log out of scantron
@@ -103,7 +107,8 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
 
 # update prior events
-RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
+RecentEventFrame = FindRecentEvents(
+  EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
 
 
 # Are you sure you ran UpdateMonitoring?  Check the history.
