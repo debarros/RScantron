@@ -1,5 +1,14 @@
 #Store Item Responses
 
+#' @title Store Item Responses
+#' @description Store item response files downloaded from the TMS
+#' @param responses output from GetItemResponses_1section
+#' @param testpath file folder path corresponding to the desired test
+#' @param classname character of length 1 holding the name of the section (as TEACHER_p#LEVEL)
+#' @param datafolder the subfolder in which to store the exports.  Defaults to "exports".
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
+#' @return Nothing gets returned by this function
+#' @details This takes an R object holding the table of item responses for given section on a given test and save it as a csv
 StoreItemResponses = function(responses, testpath, classname, datafolder = "exports", messageLevel = 0){
   datapath = paste0(testpath, "/", datafolder)                      # Build the path to the datafolder
   classname = gsub(pattern = "/", replacement = "+", x = classname) # Replace forward slashes with plusses in the class name

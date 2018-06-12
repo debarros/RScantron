@@ -1,13 +1,22 @@
 #DetermineCurrentSections.R
 
+#' @title Determine Current Sections
+#' @description Given a test code, determine what class sections are associated with it
+#' @param testname character of length 1 with the name of the desired test
+#' @param CustomSectioning table of custom sections
+#' @param Sections table of sections
+#' @param testcode testcode for the current test
+#' @param Coursecode2Testcode table associating course codes and test codes
+#' @param Coursecode2Course table associated course codes and courses
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @return data.frame
+#' @details This function should be called from other functions
 DetermineCurrentSections = function(testname, CustomSectioning, 
                                     Sections, testcode, 
                                     Coursecode2Testcode, Coursecode2Course, 
                                     messageLevel = 0){
   
-  if(messageLevel > 0){
-    print(paste0("Determining sections for test code ", testcode))
-  }
+  if(messageLevel > 0){ print(paste0("Determining sections for test code ", testcode)) }
   
   # Determine the sections for this test code
   if(testname %in% CustomSectioning$TestTitle){ # if there are custom sections, just get those
@@ -27,9 +36,7 @@ DetermineCurrentSections = function(testname, CustomSectioning,
     currentSections = Sections[Sections$ClassName %in% courses,]
   } # /if-else to determine sections
   
-  if(messageLevel > 0){
-    print(paste0("Done determining sections for this test code"))
-  }
+  if(messageLevel > 0){ print(paste0("Done determining sections for this test code")) }
   
   return(currentSections)
-} # /function
+} # /DetermineCurrentSections function

@@ -1,6 +1,12 @@
 # GetDraftName.R
 
-# This function takes a published test id and returns the name of the draft on which the published test is based
+#' @title Get Draft Name
+#' @description Get the name of the test draft given the id of the published test
+#' @param tid testID of the desired published test
+#' @param agent the browser user agent
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
+#' @return character of length 1 containing the name of the draft test
+#' @details This function takes a published test id and returns the name of the draft on which the published test is based
 GetDraftName = function(tid, agent = NULL, messageLevel = 0){
   
   if(is.null(agent)){

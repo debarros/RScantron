@@ -1,5 +1,19 @@
 # FindEvents.R
 
+#' @title Find Events
+#' @description Find testing events in Achievement Series
+#' @param StudentFrame output from the function FindStudents.  data.frame with 1
+#'   row for each student and 3 columns holding the sid, student number, and
+#'   student name.
+#' @param SchoolYear numeric of length 1 hold the year in which a school year
+#'   started (the year in September).  No events from before July 1 of that year
+#'   are returned.
+#' @param messageLevel integer of length 1 indicating level of diagnostic
+#'   messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL, in which case a
+#'   specific one is used.
+#' @return data.frame with 1 row for each testing event and 7 columns holding
+#'   various information about each testing event.
 FindEvents = function (StudentFrame, SchoolYear = NULL, messageLevel = 0, agent = NULL) {
   
   if(is.null(agent)){

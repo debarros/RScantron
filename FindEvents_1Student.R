@@ -1,5 +1,18 @@
 #FindEvents_1Student.R
 
+#' @title Find Events
+#' @description Find testing events in Achievement Series
+#' @param sid character of length 1 holding the sid (internal student id code in
+#'   Achievement Series) for a student.
+#' @param attempt numeric of length 1 representing how many tries (including the
+#'   current one) have been made to retrieve this student's testing events.
+#' @param messageLevel integer of length 1 indicating level of diagnostic
+#'   messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL, in which case a
+#'   specific one is used.
+#' @return data.frame with 1 row for each testing associated with the given
+#'   student event and 7 columns holding various information about each testing
+#'   event.
 FindEvents_1Student = function(sid, attempt = 1, messageLevel = 0, agent = NULL) {
   
   if(is.null(agent)){
@@ -43,4 +56,4 @@ FindEvents_1Student = function(sid, attempt = 1, messageLevel = 0, agent = NULL)
     print("h")
   }
   return(q)
-} # /function
+} # /FindEvents_1Student function

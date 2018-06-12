@@ -1,5 +1,11 @@
-#FindClasses.R
+# FindClasses.R
+# This gets called in the Cataloging script
 
+#' @title Find Classes
+#' @description Get the complete list of class sections with their class ID's
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @return data.frame with 1 row for each class section in Achievement Series and 12 columns holding various information
 FindClasses = function(agent = NULL, messageLevel = 0){
   
   if(is.null(agent)){
@@ -60,4 +66,4 @@ FindClasses = function(agent = NULL, messageLevel = 0){
   ClassFrame$Level[is.na(ClassFrame$Level)] = ""
   
   return(ClassFrame)
-} # end of FindClasses() function
+} # /FindClasses function

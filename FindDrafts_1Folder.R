@@ -8,6 +8,17 @@
 #This function will return a data.frame listing the names, id's, and containing folder name of every test draft in this folder
 #   (obviously, the containing folder will be the same for every test in one call of this function)
 
+#' @title Find Drafts 1 Folder
+#' @description Find all test drafts in one folder in Achievement Series
+#' @param DraftFolderRow A data.frame consisting of one row from the output from
+#'   the function FindFolders (with parameter \code{type} set to "d"),
+#'   representing a single folder in Achievement Series.  It has 3 columns:
+#'   \code{fname} is the name of the current folder.  \code{fid} is the folder
+#'   id. \code{page} is the content of the actual page displaying the folder
+#' @param messageLevel integer of length 1 indicating level of diagnostic
+#'   messages to print.  Defaults to 0.
+#' @return data.frame with 1 row for each test draft in the given folder and
+#'   columns holding the test name, folder path, and test ID.
 FindDrafts_1Folder = function (DraftFolderRow, messageLevel = 0){
   
   if(messageLevel > 0){

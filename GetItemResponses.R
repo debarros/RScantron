@@ -1,8 +1,13 @@
 # GetItemResponses.R
 
-#--------------------------------#
-#### GetAndStoreItemResponses ####
-#--------------------------------#
+#' @title Get and Store Item Responses
+#' @description Get Item Responses from the Achievement Series website and store them locally as CSVs
+#' @param RecentTestFrame output from the FindTests function
+#' @param TestFrame output from the FindTests function
+#' @param TAB.wb the result of running loadWorkbook on the TAB file
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @return This function does not return anything
 GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 0, agent = NULL) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
@@ -53,7 +58,9 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageL
     
     testpath = TAB$Local.folder[TAB$TestID == testid][1]
     
-    currentSections = DetermineCurrentSections(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course)
+    currentSections = DetermineCurrentSections(
+      testname = testname, CustomSectioning = CustomSectioning, Sections = Sections, testcode = testcode, 
+      Coursecode2Testcode = Coursecode2Testcode, Coursecode2Course = Coursecode2Course, messageLevel = messageLevel - 1)
     
     # Determine the class names and download the item response CSV's
     classnames = paste0(currentSections$TeacherName, "_p", currentSections$Period, currentSections$Level)
@@ -68,9 +75,17 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageL
 
 
 
-#--------------------------------------#
-#### GetAndStoreItemResponses_1test ####
-#--------------------------------------#
+#' @title Get and Store Item Responses 1 Test
+#' @description Get Item Responses for 1 test from the Achievement Series website and store them locally as CSVs
+#' @param classIDs character vector of classIDs for class sections relevant to the current test
+#' @param classnames character vector of names of the class sections (as TEACHER_p#LEVEL)
+#' @param testid test ID of the desired test
+#' @param testpath file folder path corresponding to the desired test
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @param removeOld logical, should the old exports be deleted.  Defaults to TRUE.
+#' @return This function does not return anything
+#' @details This function is intended to be called from other functions
 GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath, messageLevel = 0, agent = NULL, removeOld = T) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
@@ -110,9 +125,14 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
 
 
 
-#-------------------------------------------#
-#### GetAndStoreItemResponses_SingleTest ####
-#-------------------------------------------#
+#' @title Get and Store Item Responses Single Test
+#' @description Get Item Responses for 1 test from the Achievement Series website and store them locally as CSVs
+#' @param testname character of length 1 with the name of the test
+#' @param TAB.wb the result of running loadWorkbook on the TAB file
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @return This function does not return anything
+#' @details This function was written as a wrapper for GetAndStoreItemResponses_1test
 GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 0, agent = NULL) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
@@ -138,7 +158,9 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 
   testcode = substr(testname, start = 1, stop = regexpr(pattern = " ", text = testname) - 1)
   testid = TAB$TestID[TAB$TestName == testname][1]
   testpath = TAB$Local.folder[TAB$TestID == testid][1]
-  currentSections = DetermineCurrentSections(testname, CustomSectioning, Sections, testcode, Coursecode2Testcode, Coursecode2Course)
+  currentSections = DetermineCurrentSections(
+    testname = testname, CustomSectioning = CustomSectioning, Sections = Sections, testcode = testcode, 
+    Coursecode2Testcode = Coursecode2Testcode, Coursecode2Course = Coursecode2Course, messageLevel = messageLevel - 1)
   classnames = paste0(currentSections$TeacherName, "_p", currentSections$Period, currentSections$Level)
   GetAndStoreItemResponses_1test(
     classIDs     = currentSections$ClassID,
@@ -154,9 +176,14 @@ GetAndStoreItemResponses_SingleTest = function(testname, TAB.wb, messageLevel = 
 
 
 
-#---------------------------------#
-#### GetItemResponses_1section ####
-#---------------------------------#
+#' @title Get and Store Item Responses 1 section
+#' @description Get Item Responses for 1 section for a test from the Achievement Series website and store them locally as CSVs
+#' @param ClassID character of length 1 with the classID of the current class section
+#' @param TestID test ID of the desired test
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @return character of length 1 with the table of item responses.  Formatted to be converted to CSV.
+#' @details This function should be called from other functions
 GetItemResponses_1section = function(ClassID, TestID, messageLevel = 0, agent = NULL) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
