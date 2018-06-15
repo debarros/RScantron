@@ -18,7 +18,25 @@
 #   fid = the folder id of the folder
 #   page = the full html page of the folder
 
-
+#' @title Find Folders
+#' @description Find folders in Achievement Series
+#' @param type one character.  Acceptable values are t (for published tests), d
+#'   (for drafts), and s (for scheduled sessions).
+#' @param SkipFolder the name of folder that is not to be included (nor are its
+#'   subfolders).
+#' @param x the content of the current page (or empty character string during
+#'   the first call).
+#' @param parent name of the current folder (or 'Root' if it is the top level
+#'   folder).
+#' @param ThisFolderID fid of the current folder (or 'Root' if it is the top
+#'   level folder).
+#' @param messageLevel integer of length 1 indicating level of diagnostic
+#'   messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL, in which case a
+#'   specific one is used.
+#' @return data.frame with 1 row for each folder and three columns holding fname
+#'   (name of the folder), fid (folder id of the folder), and page (the content
+#'   of the webpage for the folder).
 FindFolders = function(type = "t",
                        SkipFolder = as.character('NA'),
                        x = character(), 

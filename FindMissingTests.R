@@ -1,5 +1,18 @@
 # FindMissingTests.R
 
+#' @title Find Missing Tests
+#' @description Identify tests that have recent events, but are not included in
+#'   the TAB (Test Address Book).
+#' @param RecentTestFrame output from the FindTests function.
+#' @param TAB.wb the result of running loadWorkbook on the TAB file.
+#' @param TestFrame output from the FindTests function.
+#' @param messageLevel integer of length 1 indicating level of diagnostic
+#'   messages to print.  Defaults to 0.
+#' @return character vector whose elements are the names of tests included in
+#'   \code{RecentTestFrame} but which are not in the TAB.
+#' @details This functions checks for tests that are not included in the TAB, or
+#'   that are listed with a different testID in the TAB than in Scantron.
+#'   Diagnostic messages get printed.
 FindMissingTests = function(RecentTestFrame, TAB.wb, TestFrame, messageLevel = 0){
   
   if(messageLevel > 0){ print("Finding missing tests.")}
