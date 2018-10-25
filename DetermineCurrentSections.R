@@ -30,8 +30,7 @@ DetermineCurrentSections = function(testname, CustomSectioning,
     }
   } else { # if there are no custom sections
     # Determine the courses associated with this test code
-    coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
-    courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
+    courses = DetermineCourses(testcode, Coursecode2Testcode, Coursecode2Course, messageLevel = messageLevel - 1)
     # Get all the sections of those courses
     currentSections = Sections[Sections$ClassName %in% courses,]
   } # /if-else to determine sections
@@ -40,3 +39,25 @@ DetermineCurrentSections = function(testname, CustomSectioning,
   
   return(currentSections)
 } # /DetermineCurrentSections function
+
+
+
+
+
+
+#' @title Determine Current Courses
+#' @description Given a test code, determine what courses are associated with it
+#' @param testcode abbreviation at the beginning of a test name
+#' @param Coursecode2Testcode table associating course codes and test codes
+#' @param Coursecode2Course table associated course codes and courses
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @return data.frame
+#' @details This function should be called from other functions
+DetermineCourses = function(testcode, 
+                            Coursecode2Testcode,
+                            Coursecode2Course, 
+                            messageLevel = 0){
+  coursecodes = colnames(Coursecode2Testcode)[Coursecode2Testcode[Coursecode2Testcode$testcode == testcode,] == 1]
+  courses = Coursecode2Course$Course[Coursecode2Course$CourseCode %in% coursecodes]
+  return(courses)
+} #/ DetermineCourses function
