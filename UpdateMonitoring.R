@@ -25,7 +25,7 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   }
   
   # If tests marked as needing reports were done, clear those values and set Send and Monitor to TRUE
-  if(MakeReportDone){
+  if((nrow(ScannedTests) > 0) & MakeReportDone){
     ScannedTests$SendReport[ScannedTests$MakeReport] = TRUE
     ScannedTests$Monitor[ScannedTests$MakeReport] = TRUE
     ScannedTests$MakeReport = FALSE
@@ -72,6 +72,6 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1")) # Start at A1 b/c the header row is also added
   
   # store the date and time of the current run
-  SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 2, input = Sys.time(), anchor = "A2") )
+  SWSM(gs_edit_cells(ss = ScannedTests.url, ws = "LastRun", input = Sys.time(), anchor = "A2") )
   
 } # /function
