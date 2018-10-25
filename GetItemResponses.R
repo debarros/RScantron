@@ -100,6 +100,10 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     }
   }
   
+  if(length(classIDs) == 0){
+    stop(paste0("No classes found associated with this test!"))
+  }
+  
   for (j in 1:length(classIDs)) {
     if (messageLevel > 0) {
       print(paste0("  section ", j, " of ", length(classIDs)))
@@ -116,7 +120,7 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     }
     
     # store it in the exports folder
-    StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName)
+    StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName, messageLevel = messageLevel - 1)
   } # /for each section
 } # /GetAndStoreItemResponses_1test
 
