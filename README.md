@@ -74,3 +74,25 @@
 * `CompareMirror` Compare the current state to a former state 
 * The `CompareMirror` function should generate a To Do list of Score Reports and Score Updates.
 * The `StoreMirror` function should update the score monitoring spreadsheet
+
+
+## More stuff
+
+* Make it into a package
+* What about changing the settings in the account so that it doesn’t display everything?  Then, it could use the link to access another page if it needed to.  This would have the advantage of being able to stop loading student testing events once it hit a particular date.  Not sure if this would result in improved return time.  Maybe this could be explored with some benchmarking?
+* How can we make the UpdateTab function also get the local folder?
+	* What if it launched a Select File window, and you had to select the test setup file?  It could then determine the local folder from that, and also add the test setup file name to the TAB
+* Determine the draft location and add it to the test setup file
+	* See the Load draft locations.R file.  It is incomplete as yet.
+* Redo the custom sectioning system in the TAB to have 2 columns - method and parameter
+	* Method can be List, Teacher, Teacher+Course, or Query
+	* Parameter is usually a semicolon delimited list
+	* If Method is Teacher, match all sections with the teachers named in the Parameter column
+	* If Method is List, match all sections with section numbers named in the Parameter column
+	* If Method is Teacher+Course, match all sections of the relevant course with teachers named in the Parameter column
+	* If Method is Query, match sections based on the SQL query in the Parameter column
+* Add to the TAB a sheet with section performance for score monitoring.
+	* Each time a report is generated, add or replace a row for each section and each comparison group that has an overall score
+	* Each row should include the test name, section name, and score
+	* Later, this will be used to dynamically generate the score monitoring graphs
+	* This should probably be accomplished with a new package call rrttMonitoring or something like that.
