@@ -31,7 +31,7 @@ ScannedTests.url = SWSM(gs_url(ScannedTests.url.text)) #enter the URL of the sca
 
 # Get the complete list of students and the complete list of instances in which a student has taken a test
 StudentFrame = FindStudents(messageLevel = 1, agent = agent) 
-EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 1, agent = agent) 
+EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 2, agent = agent) 
 
 # Compare new event frame to old event frame and subset to the recent events
 RecentEventFrame = FindRecentEvents(
@@ -50,12 +50,13 @@ missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame, messageLevel
 
 # If there are any missing tests, add them to the TAB and reload it
 UpdateTab(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 1)
+# Before you reload the tab, add in the local folder paths
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 
 # Download the item response files and save them
-GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 3, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "WHS (2018-03-09) Roots of Democracy", TAB.wb, messageLevel = 2)
+GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
+# GetAndStoreItemResponses_SingleTest(testname = "A2IT (2018-09-20) 1a.1 Probability", TAB.wb, messageLevel = 2)
 
 
 # Get a vector of the tests that need reports
@@ -75,15 +76,17 @@ print(i)
 while(i <= length(testsToUse)){
   print(paste0(i, " of ", length(testsToUse), " - ", testsToUse[i]))
   DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == testsToUse[i]]
-  generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
+  generateReport(DataLocation = DataLocation, TMS = "ScantronAS", HaltOnMultiResponse = T)
   i = i + 1
 }
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student number in the next line and run it and the one after
-# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "171810748",]
+# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "171810637",]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
+
+# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i],]
 
 # The following lines can be used to generate the report for one test, given the test name
 # DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Sp1 (2018-05-31) Final >"]
@@ -98,10 +101,10 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 #--------------------------#
 
 # The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
-# droptests = c("Nu (2018-05-04) Life Skills 1", "ALn (2018-04-18) Practice Exam 2 +>")
+# droptests = c(testsToUse[i])
 # RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),]
 # EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]
-
+# testsToUse = testsToUse[-i]
 
 # Update Score Monitoring
 UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
