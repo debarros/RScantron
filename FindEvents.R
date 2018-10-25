@@ -18,17 +18,21 @@ FindEvents = function (StudentFrame, SchoolYear = NULL, messageLevel = 0, agent 
   
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+  } # /set agent
+  
+  if (messageLevel > 0) {
+    print(paste0("Finding test events for each student"))
   }
   
   EventFrame = data.frame(character(), character(), character(), character(), stringsAsFactors = FALSE)
   
   for (i in 1:nrow(StudentFrame)) {
-    if (messageLevel > 0) {
+    if (messageLevel > 1) {
       print(paste0("Student ", i, " of ", nrow(StudentFrame)))
     }
     
     sid = StudentFrame$sid[i]
-    x = FindEvents_1Student(sid = sid, messageLevel = messageLevel - 1, agent = agent)
+    x = FindEvents_1Student(sid = sid, messageLevel = messageLevel - 2, agent = agent)
     x = x[, -c(2, 5, 7)] #remove unnecessary columns
     if (nrow(x) > 0) {
       StNameRep = rep(StudentFrame$StName[i], nrow(x))
