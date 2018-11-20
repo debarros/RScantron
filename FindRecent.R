@@ -14,6 +14,7 @@
 #' @param startcell
 #' @param updatePriorEvents logical - should the table of prior events be
 #'   updates with new recent events.
+#' @param useNameChanges logical - should changes in student names be considered new scores?
 #' @param messageLevel integer of length 1 indicating level of diagnostic
 #'   messages to print.  Defaults to 0.
 #' @return data.frame with one row for each recent testing event
@@ -21,7 +22,8 @@
 #'   be provided.  If \code{TAB} or \code{url.ws} is provided but
 #'   \code{RecentDays} is not, the function FindRecentEvents.compare is called.
 FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = NULL, newScores = T, 
-                            status = c("Finished"), startcell = "A1", updatePriorEvents = T, messageLevel = 0){
+                            status = c("Finished"), startcell = "A1", updatePriorEvents = T, 
+                            useNameChanges = F, messageLevel = 0){
   
   if(!is.null(RecentDays)){
     if(messageLevel > 0){ print(paste0("Finding events from the last ", RecentDays, " days.")) }
@@ -50,7 +52,8 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
       writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 # store the complete events
       saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
     }
-    RecentEventFrame = FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status, messageLevel = messageLevel - 1)
+    RecentEventFrame = FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status, 
+                                                useNameChanges, messageLevel = messageLevel - 1)
     
   } else {
     stop("You must specify at least one of RecentDays, url.ws, or TAB")
@@ -72,11 +75,12 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
 #'   TAB or a google sheet.
 #' @param status character vector of statuses to include.  Defaults to
 #'   "Finished".
+#' @param useNameChanges logical - should changes in student names be considered new scores?
 #' @param messageLevel integer of length 1 indicating level of diagnostic
 #'   messages to print.  Defaults to 0.
 #' @return data.frame with one row for each recent testing event
 #' @details This function is called from the FindRecentEvents function.
-FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, status, messageLevel = 0){
+FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, status, useNameChanges, messageLevel = 0){
   
   if(messageLevel > 0){ print("Comparing event frame to remove events that have already been reported") }
   
@@ -84,6 +88,10 @@ FindRecentEvents.compare = function(EventFrame, newScores, PriorEventFrame, stat
   if(!newScores){
     IDcolumns = IDcolumns[!(IDcolumns %in% c("Score"))]
   }
+  if(!useNameChanges){
+    IDcolumns = IDcolumns[!(IDcolumns %in% c("StNameRep"))]
+  }
+  
   PriorEventFrame$identifier = apply(PriorEventFrame[IDcolumns], MARGIN = 1, FUN = paste0, collapse = "-")
   EventFrame$identifier = apply(EventFrame[IDcolumns], MARGIN = 1, FUN = paste0, collapse = "-")
   RecentEventFrame = EventFrame[!(EventFrame$identifier %in% PriorEventFrame$identifier),1:(ncol(EventFrame)-1)]
