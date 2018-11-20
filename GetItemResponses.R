@@ -8,7 +8,7 @@
 #' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
 #' @param agent the browser user agent.  Defaults to NULL.
 #' @return This function does not return anything
-GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 0, agent = NULL) {
+GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, startRow = 1, messageLevel = 0, agent = NULL) {
   if(is.null(agent)){
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
@@ -41,7 +41,8 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, messageL
     )
   }
   
-  for (i in 1:nrow(RecentTestFrame)) {
+  
+  for (i in startRow:nrow(RecentTestFrame)) {
     if (messageLevel > 0) {
       print(paste0("row ", i, " of ", nrow(RecentTestFrame)))
     } # /if messageLevel > 0
