@@ -36,7 +36,8 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
     }
     PriorEventFrame = gs_read(ss = url.ws[[1]], ws = url.ws[[2]])                    # read in existing events
     gs_edit_cells(ss = url, ws = ws, input = EventFrame, anchor = startcell)         # store the complete events
-    RecentEventFrame = FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status)
+    RecentEventFrame = FindRecentEvents.compare(EventFrame = EventFrame, newScores = newScores, PriorEventFrame = PriorEventFrame, 
+                                                status = status, useNameChanges = F, messageLevel = messageLevel - 1)
     
   } else if(!is.null(TAB)){
     if(length(TAB) != 2){
@@ -52,8 +53,8 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
       writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 # store the complete events
       saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
     }
-    RecentEventFrame = FindRecentEvents.compare(EventFrame, newScores, PriorEventFrame, status, 
-                                                useNameChanges, messageLevel = messageLevel - 1)
+    RecentEventFrame = FindRecentEvents.compare(EventFrame = EventFrame, newScores = newScores, PriorEventFrame = PriorEventFrame, 
+                                                status = status, useNameChanges = useNameChanges, messageLevel = messageLevel - 1)
     
   } else {
     stop("You must specify at least one of RecentDays, url.ws, or TAB")
