@@ -116,8 +116,11 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     currentresponses = GetItemResponses_1section(ClassID = currentClassID, TestID = testid, agent = agent)
     
     # Check to make sure it worked
-    if (BadReturnCheck(currentresponses)) {
+    if (BadReturnCheck(currentresponses, messageLevel = messageLevel - 2)) {
       stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
+    }
+    if (TimedOutCheck(currentresponses, messageLevel = messageLevel - 2)) {
+      stop("Error!  The request timed out.  Try again.")
     }
     
     # store it in the exports folder
