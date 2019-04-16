@@ -50,7 +50,22 @@ FindRecentEvents = function(EventFrame, RecentDays = NULL, url.ws = NULL, TAB = 
     PriorEventFrame = read.xlsx(xlsxFile = TABpath, sheet = "Events")          # read in existing events
     PriorEventFrame$Date = as.Date(PriorEventFrame$Date, origin = "1899-12-30")
     if(updatePriorEvents){                                                     # update prior event table in TAB (if necessary)
-      writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 # store the complete events
+      
+      
+      
+      
+      ################################
+      
+      # This is a bad line.  It ignores the possibility that there are events in the TAB that are not included in EventFrame.
+      # This is a poor assumption because it is possible for a student to transfer out and then back in.
+      # If the student's entries are deleted, then when he transfers back in, they will appear to be new events.
+      # The data to be written should be the union of PriorEventFrame and EventFrame.
+      # There should also be a paramater that governs the behavior.
+      writeData(wb = TAB.wb, sheet = "Events", x = EventFrame)                 
+      
+      ###############################
+      
+      
       saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)
     }
     RecentEventFrame = FindRecentEvents.compare(EventFrame = EventFrame, newScores = newScores, PriorEventFrame = PriorEventFrame, 
