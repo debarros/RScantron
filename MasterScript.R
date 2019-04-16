@@ -16,7 +16,7 @@ source("credentials.R")
 
 # log in to Scantron website
 login(loginurls, username, password, SiteCode, messageLevel = 3, agent = agent)
-# If you get "Error in curl::curl_fetch_memory(url, handle = handle) : Maximum (10) redirects followed", run the next line
+# If you get "Error in curl::curl_fetch_memory(url, handle = handle) : Maximum (10) redirects followed", run the next two lines, then the previous one
 # detach("package:httr", unload = TRUE)
 # library(httr)
 
@@ -37,6 +37,7 @@ EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 2, agent = ag
 RecentEventFrame = FindRecentEvents(
   EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)
 # RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, RecentDays = 5, status = "Finished", updatePriorEvents = F)
+# RecentEventFrame = RecentEventFrame[RecentEventFrame$Date > as.Date("2019-02-13"),]
 
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame, messageLevel = 1)
@@ -56,7 +57,9 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "A2IT (2018-09-20) 1a.1 Probability", TAB.wb, messageLevel = 2)
+# startRow = 29
+# GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 2, agent = agent)
+# GetAndStoreItemResponses_SingleTest(testname = "Sp1 (2019-01-31) Gustar and Infinitives", TAB.wb, messageLevel = 2)
 
 
 # Get a vector of the tests that need reports
@@ -76,20 +79,21 @@ print(i)
 while(i <= length(testsToUse)){
   print(paste0(i, " of ", length(testsToUse), " - ", testsToUse[i]))
   DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == testsToUse[i]]
-  generateReport(DataLocation = DataLocation, TMS = "ScantronAS", HaltOnMultiResponse = T)
+  generateReport(DataLocation = DataLocation, TMS = "ScantronAS", HaltOnMultiResponse = T, messageLevel = 1)
   i = i + 1
 }
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
-# paste the student number in the next line and run it and the one after
-# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep == "171810637",]
+# paste the student numbers in the next line and run it and the ones after
+# idsToSpoil = c("171810597")
+# SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
 
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i],]
 
 # The following lines can be used to generate the report for one test, given the test name
-# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Sp1 (2018-05-31) Final >"]
+# DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Sp1 (2019-01-31) Gustar and Infinitives"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
 # Log out of scantron
@@ -101,10 +105,11 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 #--------------------------#
 
 # The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
-# droptests = c(testsToUse[i])
+# droptestnumber = i
+# droptests = c(testsToUse[droptestnumber])
 # RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),]
 # EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]
-# testsToUse = testsToUse[-i]
+# testsToUse = testsToUse[-droptestnumber]
 
 # Update Score Monitoring
 UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
@@ -115,3 +120,4 @@ RecentEventFrame = FindRecentEvents(
 
 
 # Are you sure you ran UpdateMonitoring?  Check the history.
+
