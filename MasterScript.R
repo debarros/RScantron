@@ -36,8 +36,13 @@ EventFrame = FindEvents(StudentFrame, schoolYear(), messageLevel = 2, agent = ag
 # Compare new event frame to old event frame and subset to the recent events
 RecentEventFrame = FindRecentEvents(
   EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = F, messageLevel = 1)
+
+# This next section is for when stuff gets messed up
 # RecentEventFrame = FindRecentEvents(EventFrame = EventFrame, RecentDays = 5, status = "Finished", updatePriorEvents = F)
-# RecentEventFrame = RecentEventFrame[RecentEventFrame$Date > as.Date("2019-02-13"),]
+# RecentEventFrame = RecentEventFrame[RecentEventFrame$Date > as.Date("2019-04-23"),]
+# EventFrame2 = EventFrame[EventFrame$Date < as.Date("2019-04-23"),]
+# RecentEventFrame = FindRecentEvents(EventFrame = EventFrame2, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
+
 
 #Get a list of the recently scanned tests, and how many instances per test
 RecentTestFrame = FindRecentTests(RecentEventFrame, messageLevel = 1)
@@ -57,7 +62,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
-# startRow = 29
+# startRow = 11
 # GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 2, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "Sp1 (2019-01-31) Gustar and Infinitives", TAB.wb, messageLevel = 2)
 
@@ -85,7 +90,7 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student numbers in the next line and run it and the ones after
-# idsToSpoil = c("171810597")
+# idsToSpoil = c("171810611")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
@@ -105,11 +110,11 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 #--------------------------#
 
 # The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
-# droptestnumber = i
-# droptests = c(testsToUse[droptestnumber])
-# RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),]
-# EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]
-# testsToUse = testsToUse[-droptestnumber]
+# droptestnumber = 11                        # Set the set number
+# droptests = c(testsToUse[droptestnumber])  # Grab the test name
+# RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),] # Remove the test from the recent test frame
+# EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]                # Remove the test from the overall test frame
+# testsToUse = testsToUse[-droptestnumber]                                             # Remove the test from the testsToUse list
 
 # Update Score Monitoring
 UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
