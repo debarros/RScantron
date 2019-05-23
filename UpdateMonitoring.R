@@ -15,14 +15,11 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   
   if(messageLevel > 0){ print("Updating monitoring")}
   
-  # Get the current Scanned Tests document and then clear it out
+  # Get the current Scanned Tests document 
   if(messageLevel > 0){ print("Getting the scanned test document")}
   ScannedTests = SWSM(gs_read(ss = ScannedTests.url, ws = 1, verbose = F))
-  if(nrow(ScannedTests) > 0){
-    Blank = matrix(data = "", nrow = nrow(ScannedTests), ncol = ncol(ScannedTests)) 
-    if(messageLevel > 0){ print("Clearing the scanned test document")}
-    SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = Blank, anchor = "A2")) # Start at A2 to leave the header row in place
-  }
+  replacementDimensions = c(nrow(ScannedTests), ncol(ScannedTests))
+  
   
   # If tests marked as needing reports were done, clear those values and set Send and Monitor to TRUE
   if((nrow(ScannedTests) > 0) & MakeReportDone){
@@ -54,24 +51,47 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   if(messageLevel > 0){ print("Combining existing scanned tests with new ones")}
   
   AllScannedTests = rbind(NewScannedTests, ScannedTests)
-  UniqueScannedTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
-  for(i in 1:nrow(UniqueScannedTests)){ # For each unique scanned test
-    for(j in c("MakeReport","SendReport","Update","Monitor")){ # check whether any instance of it (or or new) requires certain actions
-      UniqueScannedTests[i,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqueScannedTests$Test[i],j]))
+  UniqScanTests = AllScannedTests[!duplicated(AllScannedTests$Test),]
+  for(i in 1:nrow(UniqScanTests)){ # For each unique scanned test
+    for(j in c("MakeReport","SendReport","Update","Monitor")){ # check whether any instance of it requires any action
+      UniqScanTests[i,j] = any(unlist(AllScannedTests[AllScannedTests$Test == UniqScanTests$Test[i],j]))
     }
   }
   
-  # Remove from UniqueScannedTests any records that require no action
-  UniqueScannedTests = UniqueScannedTests[apply(X = UniqueScannedTests[,c("MakeReport","SendReport","Update","Monitor")], MARGIN = 1, FUN = any),]
+  # Remove from UniqScanTests any records that require no action
+  recordsToKeep = apply(X = UniqScanTests[,c("MakeReport","SendReport","Update","Monitor")], 
+                        MARGIN = 1, 
+                        FUN = any)
+  UniqScanTests = UniqScanTests[recordsToKeep,]
   
-  # Sort UniqueScannedTests
-  UniqueScannedTests = UniqueScannedTests[order(UniqueScannedTests$SendReport, UniqueScannedTests$MakeReport, UniqueScannedTests$Folder, decreasing = 1),]
+  # Sort UniqScanTests
+  newOrder = order(UniqScanTests$SendReport, UniqScanTests$MakeReport, UniqScanTests$Folder, decreasing = 1)
+  UniqScanTests = UniqScanTests[newOrder,]
   
   # Update the Scanned Tests document with the modified ScannedTests 
   if(messageLevel > 0){ print("Updating the Scanned Tests document")}
-  SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = UniqueScannedTests, anchor = "A1")) # Start at A1 b/c the header row is also added
+  
+  # create a remote copy of the scanned tests sheet.  Start at A1 b/c the header row is also added
+  if(messageLevel > 1){ print("Creating a backup worksheet")}
+  gs_ws_new(ss = ScannedTests.url, ws_title = "Backup", input = UniqScanTests, anchor = "A1", verbose = F)
+  
+  # clear the main worksheet if necessary
+  if(replacementDimensions[1] > 0){
+    Blank = matrix(data = "", nrow = replacementDimensions[1], ncol = replacementDimensions[2]) 
+    if(messageLevel > 1){ print("Clearing the scanned test document")}
+    SWSM(gs_edit_cells(ss = ScannedTests.url, ws = 1, input = Blank, anchor = "A2")) # Start at A2 to keep header row
+  }  
+  
+  # Load data into the main worksheet, reregister it so the backup becomes visible, and delete the backup
+  if(messageLevel > 1){ print("Filling in the new scanned tests list")}
+  SWSM(gs_edit_cells(ss = ScannedTests.url, ws = , input = UniqScanTests, anchor = "A1")) 
+  if(messageLevel > 2){ print("Reregistering the sheet")}
+  ScannedTests.url = SWSM(gs_key(x = ScannedTests.url$sheet_key)) 
+  if(messageLevel > 1){ print("Deleting the backup worksheet")}
+  SWSM(gs_ws_delete(ss = ScannedTests.url, ws = "Backup", verbose = F)) 
   
   # store the date and time of the current run
+  if(messageLevel > 1){ print("Storing the date and time")}
   SWSM(gs_edit_cells(ss = ScannedTests.url, ws = "LastRun", input = Sys.time(), anchor = "A2") )
   
 } # /function
