@@ -21,8 +21,8 @@ TimedOutCheck = function(page, messageLevel = 0){
   
   timedOutCheck = rep(F,4)
   timedOutCheck[1] = grepl(pattern = "<title>The wait operation timed out</title>", x = page, ignore.case = T)
-  timedOutCheck[2] = grepl(pattern = "An unhandled exception occurred during the execution of the current web request", x = page, ignore.case = T)
-  timedOutCheck[3] = grepl(pattern = "Please review the stack trace", x = page, ignore.case = T)
+#  timedOutCheck[2] = grepl(pattern = "An unhandled exception occurred during the execution of the current web request", x = page, ignore.case = T)
+#  timedOutCheck[3] = grepl(pattern = "Please review the stack trace", x = page, ignore.case = T)
   timedOutCheck[4] = grepl(pattern = "A network-related or instance-specific error occurred while establishing a connection", x = page, ignore.case = T)
   
   timedOutCheck = any(timedOutCheck)
