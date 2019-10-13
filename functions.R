@@ -44,11 +44,12 @@ source("UpdateMonitoring.R")
 source("Spoil.R")
 source("GetDraftName.R")
 source("TimedOutCheck.R")
+source("BadSectionCheck.R")
 
 #Data
 loginurls = list("step1" = "https://admin.achievementseries.com/Auth/Login/Org", 
                  "step2" = "https://admin.achievementseries.com/Auth/?returnUrl=%2FAuth%2FLogin%2FUser")
-TABpath = "\\\\stuthin2/Data/tests/2018-2019/TAB.xlsx"
+TABpath = "\\\\stuthin2/Data/tests/2019-2020/TAB.xlsx"
 TeacherLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "TeacherLookup")
 CourseLookup = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "CourseLookup")
 ScannedTests.url.text = "https://docs.google.com/spreadsheets/d/1js6XcxzF4y3uFtc_Uxr8e3UfvvcKjUrQzL8lKV2st1I/edit"
