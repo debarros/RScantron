@@ -15,8 +15,8 @@ DraftFrame = StoreDrafts(DraftFrame)
 
 # Catalog class sections ####
 # Get the complete list of class sections with their class ID's
-ClassFrame = FindClasses(agent = agent)
-ClassFrame = ClassFrame[order(ClassFrame$Dept, ClassFrame$ShortName, ClassFrame$Level, ClassFrame$Primary.Staff),]
+ClassFrame = FindClasses(TeacherLookup = TeacherLookup, CourseLookup = CourseLookup)
+ClassFrame = ClassFrame[order(ClassFrame$Dept, ClassFrame$ShortName, ClassFrame$Level, ClassFrame$Primary.Staff, ClassFrame$Period),]
 write.csv(ClassFrame,file = "ClassSections.csv", row.names = FALSE)
 
 # Catalog all test scores ###
