@@ -13,62 +13,68 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, startRow
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
   
-  Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
-  Coursecode2Course =  set_colnames(
-    x = as.data.frame(t(
-      read.xlsx(xlsxFile = TAB.wb,
-                sheet = "Course Codes",
-                colNames = F,
-                rowNames = F,
-                rows = 1:2)),
-      stringsAsFactors = F),
-    value = c("Course", "CourseCode"))
-  Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
-  Sections$Level[is.na(Sections$Level)] = ""
-  CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
-  TAB = read.xlsx(TAB.wb)
-  
-  # Check for testcodes missing from the TAB
-  testnames = as.character(RecentTestFrame$Published.Test)
-  testcodes = unique(substr(testnames,
-                            start = 1,
-                            stop = regexpr(pattern = " ", text = testnames) - 1))
-  testcodes = testcodes[!(testcodes %in% Coursecode2Testcode$testcode)]
-  if (length(testcodes) > 0) {
-    stop(
-      paste0("The Course Codes tab of the TAB needs rows for the following:"),
-      paste0(testcodes, collapse = ", ")
-    )
+  if(is.null(RecentTestFrame)){
+    print("The RecentTestFrame is empty.")
+  } else {
+    
+    
+    Coursecode2Testcode = read.xlsx(xlsxFile = TAB.wb, sheet = "Course Codes", startRow = 2)
+    Coursecode2Course =  set_colnames(
+      x = as.data.frame(t(
+        read.xlsx(xlsxFile = TAB.wb,
+                  sheet = "Course Codes",
+                  colNames = F,
+                  rowNames = F,
+                  rows = 1:2)),
+        stringsAsFactors = F),
+      value = c("Course", "CourseCode"))
+    Sections = read.xlsx(xlsxFile = TAB.wb, sheet = "Sections")
+    Sections$Level[is.na(Sections$Level)] = ""
+    CustomSectioning = read.xlsx(xlsxFile = TAB.wb, sheet = "CustomSectioning")
+    TAB = read.xlsx(TAB.wb)
+    
+    # Check for testcodes missing from the TAB
+    testnames = as.character(RecentTestFrame$Published.Test)
+    testcodes = unique(substr(testnames,
+                              start = 1,
+                              stop = regexpr(pattern = " ", text = testnames) - 1))
+    testcodes = testcodes[!(testcodes %in% Coursecode2Testcode$testcode)]
+    if (length(testcodes) > 0) {
+      stop(
+        paste0("The Course Codes tab of the TAB needs rows for the following:"),
+        paste0(testcodes, collapse = ", ")
+      )
+    }
+    
+    
+    for (thisrow in startRow:nrow(RecentTestFrame)) {
+      if (messageLevel > 0) {
+        print(paste0("row ", thisrow, " of ", nrow(RecentTestFrame)))
+      } # /if messageLevel > 0
+      
+      # Get the current test name, code, and id
+      testname = as.character(RecentTestFrame$Published.Test[thisrow])
+      testcode = substr(testname,
+                        start = 1,
+                        stop = regexpr(pattern = " ", text = testname) - 1)
+      
+      
+      # If this line doesn't work or returns NULL, it's probably because you altered TestFrame by stepping through the UpdateTab function
+      testid = TestFrame$tid[TestFrame$TestName == testname] 
+      
+      testpath = TAB$Local.folder[TAB$TestID == testid][1]
+      
+      currentSections = DetermineCurrentSections(
+        testname = testname, CustomSectioning = CustomSectioning, Sections = Sections, testcode = testcode, 
+        Coursecode2Testcode = Coursecode2Testcode, Coursecode2Course = Coursecode2Course, messageLevel = messageLevel - 1)
+      
+      # Determine the class names and download the item response CSV's
+      classnames = paste0(currentSections$TeacherName, "_p", currentSections$Period, currentSections$Level)
+      GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, classnames, testid, 
+                                     testpath, messageLevel = messageLevel - 1, agent = agent)
+      
+    } # /for each reportable test
   }
-  
-  
-  for (i in startRow:nrow(RecentTestFrame)) {
-    if (messageLevel > 0) {
-      print(paste0("row ", i, " of ", nrow(RecentTestFrame)))
-    } # /if messageLevel > 0
-    
-    # Get the current test name, code, and id
-    testname = as.character(RecentTestFrame$Published.Test[i])
-    testcode = substr(testname,
-                      start = 1,
-                      stop = regexpr(pattern = " ", text = testname) - 1)
-    
-    
-    # If this line doesn't work or returns NULL, it's probably because you altered TestFrame by stepping through the UpdateTab function
-    testid = TestFrame$tid[TestFrame$TestName == testname] 
-    
-    testpath = TAB$Local.folder[TAB$TestID == testid][1]
-    
-    currentSections = DetermineCurrentSections(
-      testname = testname, CustomSectioning = CustomSectioning, Sections = Sections, testcode = testcode, 
-      Coursecode2Testcode = Coursecode2Testcode, Coursecode2Course = Coursecode2Course, messageLevel = messageLevel - 1)
-    
-    # Determine the class names and download the item response CSV's
-    classnames = paste0(currentSections$TeacherName, "_p", currentSections$Period, currentSections$Level)
-    GetAndStoreItemResponses_1test(classIDs = currentSections$ClassID, classnames, testid, 
-                                   testpath, messageLevel = messageLevel - 1, agent = agent)
-    
-  } # /for each reportable test
 } # /GetAndStoreItemResponses function
 
 
@@ -105,12 +111,12 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     stop(paste0("No classes found associated with this test!"))
   }
   
-  for (j in 1:length(classIDs)) {
+  for (classIDcounter in 1:length(classIDs)) {
     if (messageLevel > 0) {
-      print(paste0("  section ", j, " of ", length(classIDs)))
+      print(paste0("  section ", classIDcounter, " of ", length(classIDs)))
     } # /if messageLevel > 0
-    currentClassID = classIDs[j]     # get the ClassID for the section
-    currentClassName = classnames[j] # get the name for the section
+    currentClassID = classIDs[classIDcounter]     # get the ClassID for the section
+    currentClassName = classnames[classIDcounter] # get the name for the section
     
     # download the item response file
     currentresponses = GetItemResponses_1section(ClassID = currentClassID, TestID = testid, agent = agent)
@@ -119,9 +125,14 @@ GetAndStoreItemResponses_1test = function(classIDs, classnames, testid, testpath
     if (BadReturnCheck(currentresponses, messageLevel = messageLevel - 2)) {
       stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
     }
-    if (TimedOutCheck(currentresponses, messageLevel = messageLevel - 2)) {
+    if (TimedOutCheck(page = currentresponses, messageLevel = messageLevel - 2)) {
       stop("Error!  The request timed out.  Try again.")
     }
+    if (BadSectionCheck(page = currentresponses, messageLevel = messageLevel - 2)) {
+      stop(paste0("Error!  The section you tried to pull from might not exist.  Check the TAB.", 
+                  "ClassID = ", currentClassID, "; ClassName = ", currentClassName))
+    }
+    
     
     # store it in the exports folder
     StoreItemResponses(responses = currentresponses, testpath = testpath, classname = currentClassName, messageLevel = messageLevel - 1)
