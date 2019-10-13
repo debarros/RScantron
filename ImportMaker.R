@@ -12,9 +12,12 @@ source("functions.R") #load the functions
 #-----------------------------------------#
 
 # Sign in to google
-#gs_auth() #this will launch a browser so you can sign into your account
-CourseSubject = gs_url(x = "https://docs.google.com/spreadsheets/d/17QhVYZkjbx34M6wBvtHUYa_XrRUlRbOtuOsQ4P5l-nk/edit?usp=sharing", lookup = F, visibility = "private")
-alignment = gs_read(ss = CourseSubject)
+# gs_auth() #this will launch a browser so you can sign into your account
+CourseSubject = gs_url(x = "https://docs.google.com/spreadsheets/d/17QhVYZkjbx34M6wBvtHUYa_XrRUlRbOtuOsQ4P5l-nk/edit?usp=sharing", lookup = F, visibility = "private", verbose = F)
+alignment = gs_read(ss = CourseSubject, verbose = F)
+alignment$Course[alignment$Course == "6th Grade Attendance"][1] = "6th Grade Attendance "
+
+
 
 #--------------------#
 #### Read in data ####
@@ -26,7 +29,12 @@ alignment = gs_read(ss = CourseSubject)
 #     expression	[03]room	[05]lastfirst	Course_Number	DateEnrolled	DateLeft	TermID SectionID
 cctable.raw = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "ccTableExport") 
 cctable = cctable.raw
-cctable = cctable[cctable$`[02]course_name` != "Independent Study",]
+cctable = cctable[!(cctable$`[02]course_name` %in% c("Independent Study","Career Internship", "6th Grade Attendance ")),]
+if("S_NY_CC_X.DualCrInd" %in% colnames(cctable)){
+  cctable$S_NY_CC_X.DualCrInd = NULL
+}
+cctable = cctable[cctable$TermID > 0,]
+
 
 # Check whethere there are any rows with missing info
 cctable$AnyNA = apply(X = cctable, MARGIN = 1, FUN = anyNA)
@@ -36,6 +44,11 @@ if(any(cctable$AnyNA)){
 } else {
   print("Yay!  No missing info in the cc table.")
 }
+
+# unique(cctable$`[03]room`)
+# x = cctable[cctable$AnyNA,]
+# x = x[!duplicated(x$SectionID),]
+# View(x)
 
 # Pull in subject areas and check for missing subjects
 cctable$subject = alignment$Subject[match(cctable$`[02]course_name`, alignment$Course)] #add subject variable
@@ -51,17 +64,22 @@ if(anyNA(cctable$subject)){
 
 # Remove unnecessary courses
 cctable = cctable[cctable$subject != "Delete",]
-dropCourses = c("Exploring Algebra with Technology")
+dropCourses = c("Exploring Algebra with Technology", "Study Hall", "6th Grade Math RTI", "6th Grade ELA RTI")
 cctable = cctable[!(cctable$`[02]course_name` %in% dropCourses), ]
 
+# Change the location of 6th grade PE
+cctable$`[03]room`[cctable$`[02]course_name` == "6th Grade PE"] = "gym"
+
 # Determine the class period
-cctable$period = substr(cctable$expression,1,1)
+periodtable = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "PeriodLookup")
+cctable$period = periodtable$Period[match(cctable$expression, periodtable$expression)]
 cctable$ScantronPeriod = cctable$period  #usually, the scantron period is the same as the actual period
 cctable$session = paste0(cctable$`[03]room`," -- ", cctable$period, " -- ",cctable$TermID)
 cctable$CourseSection = paste0(cctable$`[02]course_name`, " -- ",cctable$section_number)
 
+cctable[is.na(cctable$ScantronPeriod),]
 
-#remove spaces from course numbers
+# Remove spaces from course numbers
 cctable$ScantronCourseNumber = gsub(pattern = " ", replacement = "", x = cctable$Course_Number)
 
 # Check for courses missing from the course lookup
@@ -74,7 +92,14 @@ if(nrow(cctable.bad) > 0 ){
 }
 
 
-# Create Humanities Enrollments ####
+
+
+
+
+#-------------------------------------#
+#### Create Humanities Enrollments ####
+#-------------------------------------#
+
 HumanitiesSections = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "Humanities")
 
 if(nrow(HumanitiesSections) > 0 ){
@@ -142,7 +167,7 @@ for (i in 1:nrow(sections)){
 }
 sections$CourseSection = paste0(sections$course, " -- ", sections$sectNumber)
 
-#Add staff ID's
+# Add staff ID's
 sections$Staff1 = ""
 sections$Staff2 = ""
 sections$Staff3 = ""
@@ -169,9 +194,9 @@ for(i in 1:nrow(ComboSections)){
 sections$ScantronName = CourseLookup$Course.Name[match(sections$course, CourseLookup$PowerSchool.Name)]
 
 
-#find leftover sections
+# Find leftover sections
 if(sum(is.na(sections)) > 0){
-  leftoverEnrollments = cctable[cctable$session == sections$session[is.na(sections$ScantronName)],]
+  leftoverEnrollments = cctable[cctable$session %in% sections$session[is.na(sections$ScantronName)],]
   leftoverSections = data.frame(CourseSection = unique(leftoverEnrollments$CourseSection), stringsAsFactors = F)
   leftoverSections$session = leftoverEnrollments$session[match(leftoverSections$CourseSection, leftoverEnrollments$CourseSection)]
   leftoverSections$course = leftoverEnrollments$`[02]course_name`[match(leftoverSections$CourseSection, leftoverEnrollments$CourseSection)]
@@ -194,7 +219,7 @@ if(sum(is.na(sections)) > 0){
   }
   leftoverSections = leftoverSections[,c(2:9,1)]
   
-  #Add staff ID's
+  # Add staff ID's
   leftoverSections$Staff1 = ""
   leftoverSections$Staff2 = ""
   leftoverSections$Staff3 = ""
@@ -229,7 +254,10 @@ if(sum(is.na(sections)) > 0){
 
 # Fix Bio R/B enrollments
 BioRBsections = sections[sections$course == "Biology R/B",]
-BioRBsections$sectNumber = 1:nrow(BioRBsections)
+BioRBsections = BioRBsections[order(BioRBsections$teacher),]
+rownames(BioRBsections) = NULL
+BioRBsections$sectNumber = BioRBsections$ScantronPeriod
+BioRBsections$sectNumber[duplicated(BioRBsections$sectNumber)] = paste0("1", BioRBsections$sectNumber[duplicated(BioRBsections$sectNumber)])
 BioRBsections$courseNumber = "BioRB"
 for(i in 1:nrow(cctable)){
   if(cctable$session[i] %in% BioRBsections$session){
@@ -243,7 +271,10 @@ sections = rbind.data.frame(sections, BioRBsections, stringsAsFactors = F)
 
 # Fix Alg1 R/I enrollments
 Alg1RIsections = sections[sections$course == "Alg1 R/I",]
-Alg1RIsections$sectNumber = 1:nrow(Alg1RIsections)
+Alg1RIsections = Alg1RIsections[order(Alg1RIsections$teacher),]
+rownames(Alg1RIsections) = NULL
+Alg1RIsections$sectNumber = Alg1RIsections$ScantronPeriod
+Alg1RIsections$sectNumber[duplicated(Alg1RIsections$sectNumber)] = paste0("1", Alg1RIsections$sectNumber[duplicated(Alg1RIsections$sectNumber)])
 Alg1RIsections$courseNumber = "Alg1RI"
 for(i in 1:nrow(cctable)){
   if(cctable$session[i] %in% Alg1RIsections$session){
@@ -275,7 +306,10 @@ if(nrow(HumanitiesSections) > 0) {
 
 # Fix Alg2/IT enrollments
 Alg2ITsections = sections[sections$course == "Alg2/IT",]
-Alg2ITsections$sectNumber = 1:nrow(Alg2ITsections)
+Alg2ITsections = Alg2ITsections[order(Alg2ITsections$teacher),]
+rownames(Alg2ITsections) = NULL
+Alg2ITsections$sectNumber = Alg2ITsections$ScantronPeriod
+Alg2ITsections$sectNumber[duplicated(Alg2ITsections$sectNumber)] = paste0("1", Alg2ITsections$sectNumber[duplicated(Alg2ITsections$sectNumber)])
 Alg2ITsections$courseNumber = "Alg2IT"
 for(i in 1:nrow(cctable)){
   if(cctable$session[i] %in% Alg2ITsections$session){
@@ -303,10 +337,34 @@ sections = rbind.data.frame(sections, Alg2ITsections, stringsAsFactors = F)
 # sections = sections[sections$course != "PE 9/10",]
 # sections = rbind.data.frame(sections, PE910sections, stringsAsFactors = F)
 
+
+
+# Fix US R/Review enrollments
+USsections = sections[sections$course == "US History R/Rev",]
+USsections = USsections[order(USsections$teacher),]
+rownames(USsections) = NULL
+USsections$sectNumber = USsections$ScantronPeriod
+USsections$sectNumber[duplicated(USsections$sectNumber)] = paste0("1", USsections$sectNumber[duplicated(USsections$sectNumber)])
+USsections$courseNumber = "USRR"
+for(i in 1:nrow(cctable)){
+  if(cctable$session[i] %in% USsections$session){
+    cctable$section_number[i] = USsections$sectNumber[match(cctable$session[i], USsections$session)]
+    cctable$`[02]course_name`[i] = "US History R/Rev"
+    cctable$Course_Number[i] = "USRR"
+  }
+}
+sections = sections[sections$course != "US History R/Rev",]
+sections = rbind.data.frame(sections, USsections, stringsAsFactors = F)
+
+
+
+
+
+
 sort(unique(sections$course))
 
 
-#Fix course names and numbers
+# Fix course names and numbers
 cctable$ScantronCourseName = CourseLookup$Course.Name[match(cctable$`[02]course_name`, CourseLookup$PowerSchool.Name)]
 cctable$ScantronCourseNumber = CourseLookup$ScantronCourseNumber[match(cctable$`[02]course_name`, CourseLookup$PowerSchool.Name)]
 
@@ -318,12 +376,12 @@ if(sum(is.na(cctable)) > 0){
 
 
 
-#load table of students from PowerSchool
-#need an export of all sutdents with the following variables:
+# Load table of students from PowerSchool
+# need an export of all sutdents with the following variables:
 # student_number  grade_level   Last_Name   First_Name
 students = read.xlsx(xlsxFile = "Parameters and Settings.xlsx", sheet = "currentstudents")
 
-#check for missing staff
+# check for missing staff
 staff = unique(cctable$`[05]lastfirst`)
 staff.missing = staff[!(staff %in% TeacherLookup$LastFirst)]
 if(length(staff.missing) > 0){
@@ -413,7 +471,7 @@ colnames(out.classes) = colnames(in.classes)
 out.classes$Site.ID = Site.ID
 out.classes$Course.Number = sections$ScantronCourseNumber
 out.classes$Section.Number = sections$sectNumber
-out.classes$Lower.Grade = 9
+out.classes$Lower.Grade = 6
 out.classes$Upper.Grade = 12
 out.classes$Period = sections$ScantronPeriod
 out.classes$Primary.Staff.ID = TeacherLookup$Staff.ID[match(sections$Staff1, TeacherLookup$LastFirst)]
@@ -434,7 +492,7 @@ out.courses$Course.Number = courses$ScantronCourseNumber
 out.courses$Course.Name = courses$ScantronName
 out.courses$Course.Category = courses$Course.Category
 out.courses$SubjectAreas = "None"
-out.courses$Lower.Grade = 9
+out.courses$Lower.Grade = 6
 out.courses$Upper.Grade = 12
 
 
@@ -467,3 +525,5 @@ setdiff(unique(out.enroll$code2), unique(out.classes$code2))
 setdiff(unique(out.classes$code2), unique(out.enroll$code2))
 
 
+
+out.enroll[out.enroll$Student.ID == "161710468",]
