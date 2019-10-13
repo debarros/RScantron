@@ -62,10 +62,10 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
-# startRow = 11
-# GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 2, agent = agent)
+# startRow = 13
+# GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 4, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "Sp1 (2019-01-31) Gustar and Infinitives", TAB.wb, messageLevel = 2)
-
+# RecentTestFrame[startRow,]
 
 # Get a vector of the tests that need reports
 testsToUse = as.character(RecentTestFrame$Published.Test)
@@ -90,11 +90,11 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student numbers in the next line and run it and the ones after
-# idsToSpoil = c("171810611")
+# idsToSpoil = c("171810592")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
-
+# This is to spoil all recent scores for a particular test
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i],]
 
 # The following lines can be used to generate the report for one test, given the test name
@@ -110,18 +110,18 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 #--------------------------#
 
 # The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
-# droptestnumber = 11                        # Set the set number
+# droptestnumber = i-1                        # Set the test number
 # droptests = c(testsToUse[droptestnumber])  # Grab the test name
 # RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),] # Remove the test from the recent test frame
 # EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]                # Remove the test from the overall test frame
 # testsToUse = testsToUse[-droptestnumber]                                             # Remove the test from the testsToUse list
 
 # Update Score Monitoring
-UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 1)
+UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 3)
 
 # update prior events
 RecentEventFrame = FindRecentEvents(
-  EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 1)
+  EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 3)
 
 
 # Are you sure you ran UpdateMonitoring?  Check the history.
