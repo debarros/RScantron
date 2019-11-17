@@ -31,9 +31,9 @@ login = function(loginurls, username = character(), password = character(), Site
     agent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
   }
   
-  #-------#
-  # SETUP #
-  #-------#
+  #---------------#
+  ##### SETUP #####
+  #---------------#
   
   if (messageLevel > 0) {
     print("Starting login process")
@@ -59,9 +59,15 @@ login = function(loginurls, username = character(), password = character(), Site
   }
   x <- httr::GET(url = loginurl1, user_agent(agent))
   
-  #-----------------------#
-  # STEP 1: ENTER SITE ID #
-  #-----------------------#
+  # Check to see if the site is out of service
+  if(OutOfServiceCheck(x, messageLevel - 1)){
+    stop("Error!  It appears that the service is temporarily unavailable.  Try going to the site manually.")
+  }
+  
+  
+  #-----------------------------#
+  #### STEP 1: ENTER SITE ID ####
+  #-----------------------------#
   
   if (messageLevel > 0) {
     print("Entering siteID")
@@ -73,9 +79,9 @@ login = function(loginurls, username = character(), password = character(), Site
   
   x <- httr::POST(url = loginurl1, user_agent(agent), body = pars, encode = "multipart")
   
-  #---------------------------#
-  # STEP 2: ENTER CREDENTIALS #
-  #---------------------------#
+  #---------------------------------#
+  #### STEP 2: ENTER CREDENTIALS ####
+  #---------------------------------#
   
   if (messageLevel > 0) {
     print("Entering Username, PW")

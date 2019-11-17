@@ -19,11 +19,15 @@ FindStudents = function (messageLevel = 0, agent = NULL){
   if (BadReturnCheck(x, messageLevel - 1)) {
     stop("Error!  You are no longer logged in to Scantron.  Log in and then run this command again.")
   }
+  if(OutOfServiceCheck(x, messageLevel - 1)){
+    stop("Error!  It appears that the service is temporarily unavailable.  Try going to the site manually.")
+  }
   
   # Parse the page and find the links to students
   page = htmlParse(x)                                                  # parse the page
   links = xpathSApply(page, "//a/@href")                               # this finds all of the links in the document
   StudentLinks = substr(links[grep("info.ssp\\?id=", links)], 29, 44)  # do something to the links?
+  
   
   # The object "Location" holds the starting points of the sid codes, which are all of the same length
   Location = data.frame(integer(0))                    # initialize the location data.frame

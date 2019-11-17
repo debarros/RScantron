@@ -45,6 +45,7 @@ source("Spoil.R")
 source("GetDraftName.R")
 source("TimedOutCheck.R")
 source("BadSectionCheck.R")
+source("OutOfServiceCheck.R")
 
 #Data
 loginurls = list("step1" = "https://admin.achievementseries.com/Auth/Login/Org", 
