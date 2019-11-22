@@ -29,8 +29,9 @@ FindStudents = function (messageLevel = 0, agent = NULL){
   StudentLinks = substr(links[grep("info.ssp\\?id=", links)], 29, 44)  # do something to the links?
   
   
-  # The object "Location" holds the starting points of the sid codes, which are all of the same length
-  Location = data.frame(integer(0))                    # initialize the location data.frame
+  # The object "Location" holds the starting points of the sid codes, 
+  # which are all of the same length
+  Location = data.frame(integer(0))                                    # initialize the location data.frame
   for (i in 1:length(StudentLinks)) {
     # fill the Location data.frame with starting points of the sID codes
     Location[i, 1] = as.integer(gregexpr(pattern = StudentLinks[i], x)[[1]][1])
@@ -48,7 +49,7 @@ FindStudents = function (messageLevel = 0, agent = NULL){
   # Find the beginning point of each entry in the table
   starts = dcast(
     melt(str_locate_all(pattern = '<span class="ss2">', x)[[1]]), # this is the code that always follows test names
-    formula = Var1 ~ Var2)[, 2] + 17      # the 17 moves from 1st char of the pattern to the 1st char of the entry
+    formula = Var1 ~ Var2)[, 2] + 17                              # the 17 moves from 1st char of the pattern to the 1st char of the entry
   
   # initialize the bounds data.frame
   bounds = data.frame(starts, stringsAsFactors = FALSE)
