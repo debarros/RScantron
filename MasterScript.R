@@ -62,7 +62,7 @@ TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
-# startRow = 13
+# startRow = 4
 # GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 4, agent = agent)
 # GetAndStoreItemResponses_SingleTest(testname = "Sp1 (2019-01-31) Gustar and Infinitives", TAB.wb, messageLevel = 2)
 # RecentTestFrame[startRow,]
@@ -89,15 +89,15 @@ while(i <= length(testsToUse)){
 }
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
-# paste the student numbers in the next line and run it and the ones after
-# idsToSpoil = c("171810592")
+# paste the student numbers in the next line and run it and the ones after:
+# idsToSpoil = c("181910989")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
-# This is to spoil all recent scores for a particular test
+# This is to spoil all recent scores for a particular test:
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i],]
 
-# The following lines can be used to generate the report for one test, given the test name
+# The following lines can be used to generate the report for one test, given the test name:
 # DataLocation = read.xlsx(TAB.wb)$Local.folder[read.xlsx(TAB.wb)$TestName == "Sp1 (2019-01-31) Gustar and Infinitives"]
 # generateReport(DataLocation = DataLocation, TMS = "ScantronAS")
 
@@ -117,11 +117,15 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 # testsToUse = testsToUse[-droptestnumber]                                             # Remove the test from the testsToUse list
 
 # Update Score Monitoring
-UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, messageLevel = 3)
+UpdateMonitoring(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = T, sortDown = F, messageLevel = 3)
 
 # update prior events
 RecentEventFrame = FindRecentEvents(
-  EventFrame = EventFrame, TAB = list(TAB.wb, TABpath), status = "Finished", updatePriorEvents = T, messageLevel = 3)
+  EventFrame = EventFrame, 
+  TAB = list(TAB.wb, TABpath), 
+  status = "Finished", 
+  updatePriorEvents = T, 
+  messageLevel = 3)
 
 
 # Are you sure you ran UpdateMonitoring?  Check the history.
