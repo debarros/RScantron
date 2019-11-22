@@ -11,7 +11,7 @@
 #' @param messageLevel integer of length 1 indicating level of diagnostic messages to print
 #' @return Nothing gets returned by this function
 #' @details This function updates the spreadsheet of tests with any new tests found in the TMS
-UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = F, messageLevel = 0){
+UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeReportDone = F, sortDown = T, messageLevel = 0){
   
   if(messageLevel > 0){ print("Updating monitoring")}
   
@@ -65,7 +65,7 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   UniqScanTests = UniqScanTests[recordsToKeep,]
   
   # Sort UniqScanTests
-  newOrder = order(UniqScanTests$SendReport, UniqScanTests$MakeReport, UniqScanTests$Folder, decreasing = 1)
+  newOrder = order(UniqScanTests$SendReport, UniqScanTests$MakeReport, UniqScanTests$Folder, decreasing = sortDown)
   UniqScanTests = UniqScanTests[newOrder,]
   
   # Update the Scanned Tests document with the modified ScannedTests 
@@ -85,8 +85,10 @@ UpdateMonitoring = function(ScannedTests.url, RecentTestFrame, TAB.wb, MakeRepor
   # Load data into the main worksheet, reregister it so the backup becomes visible, and delete the backup
   if(messageLevel > 1){ print("Filling in the new scanned tests list")}
   SWSM(gs_edit_cells(ss = ScannedTests.url, ws = , input = UniqScanTests, anchor = "A1")) 
+  
   if(messageLevel > 2){ print("Reregistering the sheet")}
   ScannedTests.url = SWSM(gs_key(x = ScannedTests.url$sheet_key)) 
+  
   if(messageLevel > 1){ print("Deleting the backup worksheet")}
   SWSM(gs_ws_delete(ss = ScannedTests.url, ws = "Backup", verbose = F)) 
   
