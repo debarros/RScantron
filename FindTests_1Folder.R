@@ -26,33 +26,36 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
   # The second problem is that "\" is an escape character in R, and so must be escaped using a "\"
   TestLinks = substr(links[grep("info.ssp\\?id=",links)],29,44)    
   
-  if(length(TestLinks) == 0){    #if there are no tests in this foler, 
-    if(messageLevel > 0){ print(paste0(TestFolderRow$fname, " has no tests."))}
-    return(TempTests)            # return the empty data.frame
+  if(length(TestLinks) == 0){                                             # If there are no tests in this folder, 
+    if(messageLevel > 0){
+      print(paste0(TestFolderRow$fname, " has no tests."))
+    }
+    return(TempTests)                                                     # return the empty data.frame.
   } else {  
     
     
-    # The object "Location" holds the starting points of the test ID codes, which are all of the same length
-    Location = data.frame(integer(0))                    # initialize the location data.frame
-    for (i in 1:length(TestLinks)){                      # fill the Location data.frame with starting points of the test ID codes
+    # The object "Location" holds starting points of the test ID codes, 
+    # which are all of the same length
+    Location = data.frame(integer(0))                                     # initialize the location data.frame
+    for (i in 1:length(TestLinks)){                                       # fill Location data.frame with starting points of the test ID codes
       Location[i,1] = as.integer(
         gregexpr(pattern = TestLinks[i],TestFolderRow[1,3])[[1]][1])
     }
     
-    if(nrow(Location)==0){    # If there are no tests here,
-      return(TempTests)       # return the empty data.frame
-    } else {                  # If there are tests, continue to find them
+    if(nrow(Location)==0){                                                # If there are no tests here,
+      return(TempTests)                                                   # return the empty data.frame.
+    } else {                                                              # If there are tests, continue to find them
       
       
-      #Append to the Location data.frame the starting position of each test name
+      # Append to the Location data.frame the starting position of each test name
       Location = cbind(Location, Location + 17)
       colnames(Location) = c("TestIdStart","TestNameStart")
       
       # Next, find the ending position of every test name and a few other extraneous links
       ends = dcast(
-        melt(str_locate_all(pattern = "</a></span></td>",  #this is the code that always follows test names
+        melt(str_locate_all(pattern = "</a></span></td>",  # This is the code that always follows test names
                             TestFolderRow[1,3])[[1]]), 
-        formula = Var1 ~ Var2)[,2] - 1  #the -1 moves from 1st char after the link to the last char of the link
+        formula = Var1 ~ Var2)[,2] - 1                     # The -1 moves from 1st char after the link to the last char of the link
       
       # Append a column to the Location data.frame to hold the end point of each test name
       Location = cbind(Location, TestNameEnd = data.frame(TestNameEnd = rep(as.integer(NA), times = dim(Location)[1])))
@@ -61,7 +64,6 @@ FindTests_1Folder = function (TestFolderRow, messageLevel = 0){
       for (i in 1:dim(Location)[1]){
         Location[i,3] = min(ends[which(ends > Location[i,2])])
       }
-      
       
       for (i in 1:nrow(Location)){
         TempTests[i,1] =  as.character(substr(TestFolderRow[1,3], Location[i,2] + 1, Location[i,3]))
