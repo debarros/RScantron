@@ -20,8 +20,8 @@ UpdateTab = function(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 0)
     TestFrame = TestFrame[,c(3,1,2,4)]                                                   # Rearrange the columns
     colnames(TestFrame) = colnames(TAB)                                                  # Make the column names match
     NewTestFrame = rbind.data.frame(TAB, TestFrame)                                      # Merge the two sets of tests
+    NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]                     # Remove duplicate entries (keeping ones that already have the local folder)
     NewTestFrame = NewTestFrame[order(NewTestFrame$Local.folder, na.last = F),]          # Arrange by folder location and put the ones with missing folders first
-    NewTestFrame = NewTestFrame[!duplicated(NewTestFrame$TestName),]                     # Remove duplicate entries
     NewTestFrame = DFna.to.empty(NewTestFrame)                                           # Convert NA's to empty cells
     writeData(wb = TAB.wb, sheet = "TAB", x = NewTestFrame)                              # Put the data into the workbook object
     saveWorkbook(wb = TAB.wb, file = TABpath, overwrite = T)                             # Save the workbook to the file system
