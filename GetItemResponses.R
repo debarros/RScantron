@@ -61,7 +61,7 @@ GetAndStoreItemResponses = function(RecentTestFrame, TestFrame, TAB.wb, startRow
       
       # If this line doesn't work or returns NULL, it's probably because you altered TestFrame by stepping through the UpdateTab function
       testid = TestFrame$tid[TestFrame$TestName == testname] 
-      if(is.NULL(testid)){
+      if(is.null(testid)){
         stop(paste0("No testid was found for ",testname,".  Did you alter the TestFrame by stepping through the UpdateTab function?"))
       }
       
