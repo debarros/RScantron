@@ -60,11 +60,12 @@ UpdateTab(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 1)
 TAB.wb = loadWorkbook(xlsxFile = TABpath)
 
 
+# Before this next part is run, the scanned tests document should be retrieved.  that way, anything that is marked as needing a new report can have new item response files pulled.
 # Download the item response files and save them
 GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, agent = agent)
 # startRow = 4
 # GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, startRow = startRow, messageLevel = 4, agent = agent)
-# GetAndStoreItemResponses_SingleTest(testname = "Sp1 (2019-01-31) Gustar and Infinitives", TAB.wb, messageLevel = 2)
+# GetAndStoreItemResponses_SingleTest(testname = "L1 (2019-11-21) TKAM Part 1", TAB.wb, messageLevel = 4)
 # RecentTestFrame[startRow,]
 
 # Get a vector of the tests that need reports
@@ -90,7 +91,7 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student numbers in the next line and run it and the ones after:
-# idsToSpoil = c("181910989")
+# idsToSpoil = c("171810657")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
