@@ -220,3 +220,28 @@ GetItemResponses_1section = function(ClassID, TestID, messageLevel = 0, agent = 
   responses = gsub(pattern = "\r\n", replacement = "\n", x = responses) # replace CRLF with LF to avoid blank lines
   return(responses)
 } # /GetItemResponses_1section
+
+
+
+
+
+
+
+
+
+#' @title Get and Store Item Responses Several Tests
+#' @description Get Item Responses for several tests from the Achievement Series website and store them locally as CSVs
+#' @param testname character vector of the names of the tests
+#' @param TAB.wb the result of running loadWorkbook on the TAB file
+#' @param messageLevel integer of length 1 indicating level of diagnostic messages to print.  Defaults to 0.
+#' @param agent the browser user agent.  Defaults to NULL.
+#' @return This function does not return anything
+#' @details This function was written as a wrapper for GetAndStoreItemResponses_SingleTest
+GetAndStoreItemResponses_SeveralTests = function(testnames, TAB.wb, messageLevel = 0, agent = NULL) {
+  for(thisTest in testnames){
+    print(thisTest)
+    GetAndStoreItemResponses_SingleTest(testname = thisTest, TAB.wb = TAB.wb, messageLevel = messageLevel - 1, agent = agent) 
+  } # /for
+  
+} # /GetAndStoreItemResponses_SeveralTests
+
