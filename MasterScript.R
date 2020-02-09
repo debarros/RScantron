@@ -68,8 +68,13 @@ GetAndStoreItemResponses(RecentTestFrame, TestFrame, TAB.wb, messageLevel = 2, a
 # GetAndStoreItemResponses_SingleTest(testname = "L1 (2019-11-21) TKAM Part 1", TAB.wb, messageLevel = 4)
 # RecentTestFrame[startRow,]
 
+
+# testnames = c("US (2019-10-28) 2A American Revolution >", "USRR (2019-10-04) U1 Colonial Foundations")
+# GetAndStoreItemResponses_SeveralTests(testnames = testnames, TAB.wb, messageLevel = 4, agent = agent)
+
 # Get a vector of the tests that need reports
 testsToUse = as.character(RecentTestFrame$Published.Test)
+# testsToUse = testnames
 
 # Pull the scanned tests document to look for other tests that need to have reports generated
 ScannedTests = SWSM(gs_read(ss = ScannedTests.url, ws = 1, verbose = F))
@@ -91,7 +96,7 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student numbers in the next line and run it and the ones after:
-# idsToSpoil = c("171810657")
+# idsToSpoil = c("171810594")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
