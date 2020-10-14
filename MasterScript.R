@@ -54,6 +54,11 @@ TestFrame = FindTests(TestFolderFrame, messageLevel = 1)
 # Check for tests not included in the tab, or that have altered testID's
 missingTests = FindMissingTests(RecentTestFrame, TAB.wb, TestFrame, messageLevel = 1)
 
+
+# At this point, we should check to make sure that all of the missingTests appear in TestFrame
+# If they don't, that means that the published test is located in a folder that was skipped when TestFolderFrame was created
+
+
 # If there are any missing tests, add them to the TAB and reload it
 UpdateTab(missingTests, TestFrame, TAB.wb, TABpath, messageLevel = 1)
 # Before you reload the tab, add in the local folder paths
@@ -96,7 +101,7 @@ while(i <= length(testsToUse)){
 
 # If the while loop throws an error and a row has to be deleted from a csv export, 
 # paste the student numbers in the next line and run it and the ones after:
-# idsToSpoil = c("171810594")
+# idsToSpoil = c("181911096")
 # SpoilFrame = RecentEventFrame[RecentEventFrame$Published.Test == testsToUse[i] & RecentEventFrame$StNumberRep %in% idsToSpoil,]
 # Spoil(SpoilFrame = SpoilFrame, messageLevel = 4)
 
@@ -117,7 +122,7 @@ LogoutPage = logout(messageLevel = 1, agent = agent)
 
 # The following lines can be used to remove tests from tracking (e.g. if reports couldn't be made)
 # droptestnumber = i-1                        # Set the test number
-# droptests = c(testsToUse[droptestnumber])  # Grab the test name
+# droptests = c(testsToUse[droptestnumber])   # Grab the test name
 # RecentTestFrame = RecentTestFrame[!(RecentTestFrame$Published.Test %in% droptests),] # Remove the test from the recent test frame
 # EventFrame = EventFrame[!(EventFrame$Published.Test %in% droptests),]                # Remove the test from the overall test frame
 # testsToUse = testsToUse[-droptestnumber]                                             # Remove the test from the testsToUse list
